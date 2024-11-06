@@ -18,6 +18,15 @@ class Solution():
                 else:
                     dp[i][j]=max(dp[i-1][j-weights[i]]+values[i],dp[i-1][j])
         return dp[-1][-1]
+
+
+    def bag2(self,weights,values,capacity):
+        dp=[0]*(capacity+1)
+        for i in range(len(weights)):
+            for j in range(capacity,weights[i]-1,-1):
+                dp[j]=max(dp[j],dp[j-weights[i]]+values[i])
+        return dp[capacity]
+    
 if __name__ == '__main__':    
     weights=[2,3,4,5]
     values=[1,5,3,7]    
