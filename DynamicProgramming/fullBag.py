@@ -11,8 +11,8 @@ class Solution():
     #二维的dp 
     def fullbag(self,weights,values,capacity):
         dp=[[0]*(capacity+1) for _ in range(len(weights))]
-        for i in range(capacity+1):
-            dp[0][i]=values[0]
+        #for i in range(capacity+1):
+         #   dp[0][i]=values[0]
         for i in  range(1,len(weights)):
             for j in range(capacity+1):
                 # if j<weights[i]:
