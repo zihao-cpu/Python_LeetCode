@@ -30,5 +30,5 @@ def largestExtraRectangle(heights):
     #计算面积
     for i in range(size):
         result=max(result,heights[i]*(min_right_index[i]-min_left_index[i]-1))
-        return result
+    return result
     
