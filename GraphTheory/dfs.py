@@ -43,6 +43,8 @@ class Solution:
     def main2(self):
         #定义一个图 邻接表方法
         from collections import defaultdict
+
+        #{1:[3,5],2:[4,3,5],3:[4],4:[2,3,5],5:[1,2,4]}->1指向3和5，2指向4、3、5，3指向4，4指向2、3、5，5指向1、2、4
         n, m = map(int, input().split())
         grapth = defaultdict(list)
         for _ in range(m):
