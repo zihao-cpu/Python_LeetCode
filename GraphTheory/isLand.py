@@ -18,7 +18,20 @@ class Solution:
             if grid[nx][ny]==1 and not visited[nx][ny]:
                 visited[nx][ny]=True
                 self.dfs(grid,visited,nx,ny)
-
+    #广度搜索
+    def bfs(self,grid,visited,x,y):
+        from collections import deque
+        q=deque()
+        q.append([x,y])
+        while q:
+            cur_x,cur_y=q.popleft()
+            for dx,dy in self.directions:
+                nx,ny=cur_x+dx,cur_y+dy
+                if nx<0 or nx>=len(grid) or ny<0 or ny>=len(grid):
+                    continue
+                if grid[nx][ny]==1 and not visited[nx][ny]:
+                    visited[nx][ny]=True
+                    q.append([nx,ny])
 
     def main(self):
         n,m=map(int,input().split())
@@ -26,10 +39,14 @@ class Solution:
         for i in range(n):
             grid.append(list(map(int,input().split())))
         visited=[[False for j in range(m)] for i in range(n)]
-        res=0
+        res1=0
+        res2=0
         for i in range(n):
             for j in range(m):
                 if grid[i][j]==1 and not visited[i][j]:
-                    res+=1
+                    res1+=1
                     visited[i][j]=True
                     self.dfs(grid,visited,i,j)
+
+                    res2+=1
+                    self.bfs(grid,visited,i,j)
