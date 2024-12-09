@@ -15,7 +15,7 @@ class Solution:
         global count
         for dx,dy in self.directions:
             nx,ny=x+dx,y+dy
-            if nx<0 or nx>=len(grid) or ny<0 or ny>=len(grid):
+            if nx<0 or nx>=len(grid) or ny<0 or ny>=len(grid[0]):
                 continue
             if grid[nx][ny]==1 and not visited[nx][ny]:
                 visited[nx][ny]=True
@@ -31,7 +31,7 @@ class Solution:
             cur_x,cur_y=q.popleft()
             for dx,dy in self.directions:
                 nx,ny=cur_x+dx,cur_y+dy
-                if nx<0 or nx>=len(grid) or ny<0 or ny>=len(grid):
+                if nx<0 or nx>=len(grid) or ny<0 or ny>=len(grid[0]):
                     continue
                 if grid[nx][ny]==1 and not visited[nx][ny]:
                     visited[nx][ny]=True
