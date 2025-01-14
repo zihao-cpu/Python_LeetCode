@@ -1,9 +1,1 @@
-#快慢指针
-##双指针
-###1.移除元素：
-  https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0027.%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0.md; 
-  Code：https://github.com/zihao-cpu/Python_LeetCode/blob/main/Array/%E7%A7%BB%E9%99%A4%E5%85%83%E7%B4%A0.py
-###2.移除0值： 
-  https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0283.%E7%A7%BB%E5%8A%A8%E9%9B%B6.md；
-  Code:https://github.com/zihao-cpu/Python_LeetCode/blob/main/Array/moveZeros.py
-上面两题都是移除元素的
+
