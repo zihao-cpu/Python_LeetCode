@@ -61,6 +61,38 @@ class Solution:
         return res
 ```
 
+# 前缀和
+
+## 区间和
+
+[leetcode-master/problems/kamacoder/0058.区间和.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0058.%E5%8C%BA%E9%97%B4%E5%92%8C.md)
+
+**前缀和 在涉及计算区间和的问题时非常有用**！
+
+![img](https://camo.githubusercontent.com/c5e8f80aaf6dfb30b68f350755cf96736b2a8b86d1108932ca9131e752fb524b/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303234303632373131313331392e706e67)
+
+p里面存的是累加和
+
+如果，我们想统计，在vec数组上 下标 2 到下标 5 之间的累加和，那是不是就用 p[5] - p[1] 就可以了。
+
+为什么呢？
+
+p[1] = vec[0] + vec[1];
+
+p[5] = vec[0] + vec[1] + vec[2] + vec[3] + vec[4] + vec[5]
+
+p[5] - p[1] = vec[2] + vec[3] + vec[4] + vec[5];
+
+```
+    p = [0] * n
+    presum = 0
+    for i in range(n):
+        presum += vec[i]
+        p[i] = presum
+        
+        
+```
+
 
 
 # 滑动窗口
@@ -148,4 +180,28 @@ class Solution(object):
 
         return matrix
 ```
+
+## 5.多少小于当前数字的数字
+
+[leetcode-master/problems/1365.有多少小于当前数字的数字.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/1365.%E6%9C%89%E5%A4%9A%E5%B0%91%E5%B0%8F%E4%BA%8E%E5%BD%93%E5%89%8D%E6%95%B0%E5%AD%97%E7%9A%84%E6%95%B0%E5%AD%97.md)
+
+排序结合hash表
+
+数组从小到大排序，排序后的下标就是小于当前数字的个数。存入hash 表中，避免重复的数字。
+
+```python
+class Solution:
+    def smallerNumbersThanCurrent(self, nums: List[int]) -> List[int]:
+        res = nums[:]
+        hash = dict()
+        res.sort() # 从小到大排序之后，元素下标就是小于当前数字的数字
+        for i, num in enumerate(res):
+            if num  not in hash.keys(): # 遇到了相同的数字，那么不需要更新该 number 的情况
+                hash[num] = i       
+        for i, num in enumerate(nums):
+            res[i] = hash[num]
+        return res
+```
+
+
 
