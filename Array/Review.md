@@ -205,3 +205,27 @@ class Solution:
 
 
 
+## 6.两数之和
+
+[leetcode-master/problems/0001.两数之和.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0001.%E4%B8%A4%E6%95%B0%E4%B9%8B%E5%92%8C.md)
+
+利用hash表 把看过的数字放入 hash 表中
+
+```
+class Solution():
+    def twoSum(self,nums:list[int],target:int)->list[int]:
+        record=dict()
+        for index,value in enumerate(nums):
+            if target-value in record:
+                return [record[target-value],index]
+            record[value]=index  #把查看过的数据放入字典
+        return []
+    
+    def twoSum(self,nums:list[int],target:int)->list[int]:
+        record=set()
+        for index,value in enumerate(nums):
+            if target-value in record:
+                return [nums.index[target-value],index]
+            record.add(value)   #把查看过的数据放入集合
+```
+
