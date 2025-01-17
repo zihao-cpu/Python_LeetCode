@@ -61,6 +61,101 @@ class Solution:
         return res
 ```
 
+## 三数之和
+
+[leetcode-master/problems/0015.三数之和.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0015.%E4%B8%89%E6%95%B0%E4%B9%8B%E5%92%8C.md)
+
+首先将数组排序，然后有一层for循环，i从下标0的地方开始，同时定一个下标left 定义在i+1的位置上，定义下标right 在数组结尾的位置上。依然还是在数组中找到 abc 使得a + b +c =0，我们这里相当于 a = nums[i]，b = nums[left]，c = nums[right]。
+
+接下来如何移动left 和right呢，
+
+ 如果nums[i] + nums[left] + nums[right] > 0 就说明 此时三数之和大了，因为数组是排序后了，所以right下标就应该向左移动，这样才能让三数之和小一些。
+
+如果 nums[i] + nums[left] + nums[right] < 0 说明 此时 三数之和小了，left 就向右移动，才能让三数之和大一些，直到left与right相遇为止。
+
+```python
+    def threeSum(self,nums:list[int])->list[list[int]]:
+        result=[]
+        nums.sort()
+        for i in range(len(nums)):
+            if nums[i]>0:
+                break
+            if i>0 and nums[i]==nums[i-1]: #a 去重   注意
+                continue 
+             '''
+             不能写成这样
+             if (nums[i] == nums[i + 1])
+    			continue
+					
+             
+             '''   
+                
+            left=i+1
+            right=len(nums)-1
+
+            while right>left:
+                sum_=nums[i]+nums[left]+nums[right]
+                if sum_<0:
+                    left+=1
+                elif sum_>0:
+                    right-=1
+                else:
+                    result.append[nums[i],nums[left],nums[right]]
+                    while right>left and nums[right]==nums[right-1]:
+                        right-=1
+                    while right>left and nums[left]==nums[left+1]:
+                        left+=1
+                    right-=1
+                    left+=1
+        return result
+```
+
+## 四数之和
+
+三数之和的基础上再套一层循环
+
+```
+class Solution:
+    def fourSum(self, nums: List[int], target: int) -> List[List[int]]:
+        nums.sort()
+        n = len(nums)
+        result = []
+        for i in range(n):
+            if nums[i] > target and nums[i] > 0 and target > 0:# 剪枝（可省）
+                break
+            if i > 0 and nums[i] == nums[i-1]:# 去重
+                continue
+            for j in range(i+1, n):
+                if nums[i] + nums[j] > target and target > 0: #剪枝（可省）
+                    break
+                if j > i+1 and nums[j] == nums[j-1]: # 去重
+                    continue
+                left, right = j+1, n-1
+                while left < right:
+                    s = nums[i] + nums[j] + nums[left] + nums[right]
+                    if s == target:
+                        result.append([nums[i], nums[j], nums[left], nums[right]])
+                        while left < right and nums[left] == nums[left+1]:
+                            left += 1
+                        while left < right and nums[right] == nums[right-1]:
+                            right -= 1
+                        left += 1
+                        right -= 1
+                    elif s < target:
+                        left += 1
+                    else:
+                        right -= 1
+        return result
+```
+
+
+
+
+
+
+
+
+
 # 前缀和
 
 ## 区间和
@@ -228,4 +323,3 @@ class Solution():
                 return [nums.index[target-value],index]
             record.add(value)   #把查看过的数据放入集合
 ```
-
