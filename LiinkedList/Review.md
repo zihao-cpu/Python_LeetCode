@@ -116,7 +116,7 @@ funcion(head)
     return cur
 ```
 
-```
+```python
 # 递归版本
 # Definition for singly-linked list.
 # class ListNode:
@@ -164,5 +164,93 @@ class Solution:
             temp.next = temp1
             current = current.next.next
         return dummy_head.next
+```
+
+
+
+## 4.删除链表的倒数第N个节点
+
+双指针的经典应用，如果要删除倒数第n个节点，让fast移动n步，然后让fast和slow同时移动，直到fast指向链表末尾。删掉slow所指向的节点就可以了
+
+![img](https://camo.githubusercontent.com/951b1807964b821d0ecdc600937a050bff11e8d287adf8ee208aca8430dbf1a4/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f31392e2545352538382541302545392539392541342545392539332542452545382541312541382545372539412538342545352538302539322545362539352542302545372541432541434e2545342542382541412545382538412538322545372538322542392e706e67)
+
+![img](https://camo.githubusercontent.com/c72f3d8e7dc02f6458aa3bef1199f984c294a3ebc10c7099fde60720adef853f/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f31392e2545352538382541302545392539392541342545392539332542452545382541312541382545372539412538342545352538302539322545362539352542302545372541432541434e254534254238254141254538253841253832254537253832254239322e706e67)
+
+slow的位置就是链表倒数N的位置。
+
+```python
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, val=0, next=None):
+#         self.val = val
+#         self.next = next
+
+class Solution:
+    def removeNthFromEnd(self, head: ListNode, n: int) -> ListNode:
+        # 创建一个虚拟节点，并将其下一个指针设置为链表的头部
+        dummy_head = ListNode(0, head)
+        
+        # 创建两个指针，慢指针和快指针，并将它们初始化为虚拟节点
+        slow = fast = dummy_head
+        
+        # 快指针比慢指针快 n+1 步
+        for i in range(n+1):
+            fast = fast.next
+        
+        # 移动两个指针，直到快速指针到达链表的末尾
+        while fast:
+            slow = slow.next
+            fast = fast.next
+        
+        # 通过更新第 (n-1) 个节点的 next 指针删除第 n 个节点
+        slow.next = slow.next.next
+        
+```
+
+## 5.链表相交
+
+[leetcode-master/problems/面试题02.07.链表相交.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/%E9%9D%A2%E8%AF%95%E9%A2%9802.07.%E9%93%BE%E8%A1%A8%E7%9B%B8%E4%BA%A4.md)
+
+简单来说，就是求两个链表交点节点的**指针**。 这里同学们要注意，交点不是数值相等，而是指针相等。
+
+为了方便举例，假设节点元素数值相等，则节点指针相等。
+
+看如下两个链表，目前curA指向链表A的头结点，curB指向链表B的头结点：
+
+
+
+![面试题02.07.链表相交_1](https://camo.githubusercontent.com/71d352988b0ffaa52b25fad679200ba83fcb305037b8990d6e87b766d29aed05/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f25453925394425413225453825414625393525453925413225393830322e30372e2545392539332542452545382541312541382545372539422542382545342542412541345f312e706e67)
+
+
+
+![面试题02.07.链表相交_2](https://camo.githubusercontent.com/9011b5336369e3e3ca6139ce672cc272104557eebdd700dbcdd5d105bc0c8cd5/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f25453925394425413225453825414625393525453925413225393830322e30372e2545392539332542452545382541312541382545372539422542382545342542412541345f322e706e67)
+
+此时我们就可以比较curA和curB是否相同，如果不相同，同时向后移动curA和curB，如果遇到curA == curB，则找到交点。
+
+```python
+class Solution:
+    def getIntersectionNode(self, headA: ListNode, headB: ListNode) -> ListNode:
+        lenA, lenB = 0, 0
+        cur = headA
+        while cur:         # 求链表A的长度
+            cur = cur.next 
+            lenA += 1
+        cur = headB 
+        while cur:         # 求链表B的长度
+            cur = cur.next 
+            lenB += 1
+        curA, curB = headA, headB
+        if lenA > lenB:     # 让curB为最长链表的头，lenB为其长度
+            curA, curB = curB, curA
+            lenA, lenB = lenB, lenA 
+        for _ in range(lenB - lenA):  # 让curA和curB在同一起点上（末尾位置对齐）
+            curB = curB.next 
+        while curA:         #  遍历curA 和 curB，遇到相同则直接返回
+            if curA == curB:
+                return curA
+            else:
+                curA = curA.next 
+                curB = curB.next
+        return None 
 ```
 
