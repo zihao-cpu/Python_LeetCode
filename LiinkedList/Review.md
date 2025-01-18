@@ -254,3 +254,79 @@ class Solution:
         return None 
 ```
 
+## 6.重排链表
+
+[leetcode-master/problems/0143.重排链表.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0143.%E9%87%8D%E6%8E%92%E9%93%BE%E8%A1%A8.md)
+
+双向队列
+
+加入双向队列后 一后一前弹出
+
+```python
+    def reorderList(self, head: ListNode) -> None:
+        """
+        Do not return anything, modify head in-place instead.
+        """
+        d=collections.deque()
+        tmp=head
+        while tmp.next:
+            d.append(tmp.next)
+            tmp=tmp.next
+        tmp=head
+        while d:
+            tmp.next=d.pop()
+            tmp=tmp.next
+            if len(d):
+                tmp.next=d.popleft()
+                tmp=tmp.next
+        tmp.next=None
+```
+
+
+
+分割链表
+
+![img](https://camo.githubusercontent.com/f0286d83bfb1310344a73e02a8e6e8fa72eef9f0a7453bf3cbfd579f74112b77/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f3134332ee9878de68e92e993bee8a1a82e706e67)
+
+```python
+# 方法三 反转链表
+class Solution:
+    def reorderList(self, head: ListNode) -> None:
+        if head == None or head.next == None:
+            return True
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+        right = slow.next # 分割右半边
+        slow.next = None # 切断
+        right = self.reverseList(right) #反转右半边
+        left = head
+        # 左半边一定比右半边长, 因此判断右半边即可
+        while right:
+            curLeft = left.next
+            left.next = right
+            left = curLeft
+
+            curRight = right.next
+            right.next = left
+            right = curRight
+
+
+    def reverseList(self, head: ListNode) -> ListNode:
+            if not head or not head.next:
+                return head
+            pre=None
+            cur=head
+            while cur:
+                nxt=cur.next
+                cur.next=pre
+                pre=cur
+                cur=nxt
+            return pre
+```
+
+```
+涉及到的细节:首先吧cur.next存出来，因为原始的cur的next会发生变化的 :nxt=cur.next curLeft = left.next都是有体现的。
+```
+
