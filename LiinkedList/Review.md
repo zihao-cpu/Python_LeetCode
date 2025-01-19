@@ -330,3 +330,85 @@ class Solution:
 涉及到的细节:首先吧cur.next存出来，因为原始的cur的next会发生变化的 :nxt=cur.next curLeft = left.next都是有体现的。
 ```
 
+## 7.环形链表
+
+[leetcode-master/problems/0141.环形链表.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0141.%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8.md)
+
+快慢指针
+
+```python
+class Solution:
+    def hasCycle(self, head: ListNode) -> bool:
+        if not head: return False
+        slow, fast = head, head
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            if fast == slow:
+                return True
+        return False
+```
+
+## 8.环形链表2
+
+[leetcode-master/problems/0142.环形链表II.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0142.%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8II.md)
+
+![142环形链表5](https://camo.githubusercontent.com/caad5d92f6a26b7cca39c8bfec5a7ddc40ca10073291cbf46e45fcc335bb63bf/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303331383136353132333538312e706e67)
+
+(x + y) * 2 = x + y + n (y + z)
+
+x=(n-1)(y+z)+z
+
+```python
+（版本一）快慢指针法
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+
+class Solution:
+    def detectCycle(self, head: ListNode) -> ListNode:
+        slow = head
+        fast = head
+        
+        while fast and fast.next:
+            slow = slow.next
+            fast = fast.next.next
+            
+            # If there is a cycle, the slow and fast pointers will eventually meet
+            if slow == fast:
+                # Move one of the pointers back to the start of the list
+                slow = head
+                while slow != fast:
+                    slow = slow.next
+                    fast = fast.next
+                return slow
+        # If there is no cycle, return None
+        return None
+```
+
+集合法 把看过的节点放入集合中
+
+```python
+（版本二）集合法
+# Definition for singly-linked list.
+# class ListNode:
+#     def __init__(self, x):
+#         self.val = x
+#         self.next = None
+
+
+class Solution:
+    def detectCycle(self, head: ListNode) -> ListNode:
+        visited = set()
+        
+        while head:
+            if head in visited:
+                return head
+            visited.add(head)
+            head = head.next
+        return None
+```
+
