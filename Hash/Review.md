@@ -35,6 +35,19 @@ class Solution:
         return s_dict == t_dict
 ```
 
+```python
+    def isAnagram(self,s:str,t:str)->bool:
+
+        cnts = Counter(s) #用哈希表来完成 
+        cntt = Counter(t) #用哈希表来完成 
+        if cnts==cntt:
+            return True
+        return False
+
+```
+
+
+
 # 查找常用字符
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/1002.%E6%9F%A5%E6%89%BE%E5%B8%B8%E7%94%A8%E5%AD%97%E7%AC%A6.md
@@ -106,7 +119,7 @@ class Solution:
         return l
 ```
 
-## 两个数组的交集
+# 两个数组的交集
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0349.%E4%B8%A4%E4%B8%AA%E6%95%B0%E7%BB%84%E7%9A%84%E4%BA%A4%E9%9B%86.md
 
@@ -159,5 +172,78 @@ class Solution:
                 result.append(k)
         return result
 	
+```
+
+# 快乐数
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0202.%E5%BF%AB%E4%B9%90%E6%95%B0.md
+
+难点1：所以这道题目使用哈希法，来判断这个sum是否重复出现，如果重复了就是return false， 否则一直找到sum为1为止。
+
+难点2：求和的过程
+
+```python
+#求和的过程
+    def get_sum(self,n: int) -> int: 
+        new_num = 0
+        while n:
+            n, r = divmod(n, 10)
+            new_num += r ** 2
+        return new_num
+```
+
+```python
+class Solution:
+    def isHappy(self, n: int) -> bool:        
+        record = set()
+
+        while True:
+            n = self.get_sum(n)
+            if n == 1:
+                return True
+            
+            # 如果中间结果重复出现，说明陷入死循环了，该数不是快乐数
+            if n in record:
+                return False
+            else:
+                record.add(n)
+
+    def get_sum(self,n: int) -> int: 
+        new_num = 0
+        while n:
+            n, r = divmod(n, 10)
+            new_num += r ** 2
+        return new_num
+```
+
+```python
+class Solution:
+   def isHappy(self, n: int) -> bool:
+       record = set()
+       while n not in record:
+           record.add(n)
+           new_num = 0
+           n_str = str(n)
+           for i in n_str:
+               new_num+=int(i)**2
+           if new_num==1: return True
+           else: n = new_num
+       return False
+```
+
+# 两数之和
+
+建立hashmap 键是nums[i] 值是index
+
+```python
+class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        records = dict()
+
+        for index, value in enumerate(nums):  
+            if target - value in records:   # 遍历当前元素，并在map中寻找是否有匹配的key
+                return [records[target- value], index]
+            records[value] = index    # 如果没找到匹配对，就把访问过的元素和下标加入到map中
+        return []
 ```
 
