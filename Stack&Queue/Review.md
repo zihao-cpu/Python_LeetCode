@@ -232,3 +232,52 @@ class Solution(object):
         return stack.pop()
 ```
 
+# 滑动窗口最大值
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0239.%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E6%9C%80%E5%A4%A7%E5%80%BC.md
+
+![img](https://camo.githubusercontent.com/d376e4690858b3fda00a591ef5d1123dc7ae4f07ece1a18bd2981e04fa579fe6/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f3233392ee6bb91e58aa8e7aa97e58fa3e69c80e5a4a7e580bc2e706e67)
+
+单调队列
+
+![239.滑动窗口最大值](https://camo.githubusercontent.com/fbf7eec9d2e2e9e9bb686780aa3f0d46a51867d25e16cc890f468d2082753507/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f676966732f3233392e2545362542422539312545352538412541382545372541412539372545352538462541332545362539432538302545352541342541372545352538302542432e676966)
+
+```python
+from collections import deque
+
+
+class MyQueue: #单调队列（从大到小
+    def __init__(self):
+        self.queue = deque() #这里需要使用deque实现单调队列，直接使用list会超时
+    
+    #每次弹出的时候，比较当前要弹出的数值是否等于队列出口元素的数值，如果相等则弹出。
+    #同时pop之前判断队列当前是否为空。
+    def pop(self, value):
+        if self.queue and value == self.queue[0]:
+            self.queue.popleft()#list.pop()时间复杂度为O(n),这里需要使用collections.deque()
+            
+    #如果push的数值大于入口元素的数值，那么就将队列后端的数值弹出，直到push的数值小于等于队列入口元素的数值为止。
+    #这样就保持了队列里的数值是单调从大到小的了。
+    def push(self, value):
+        while self.queue and value > self.queue[-1]:
+            self.queue.pop()
+        self.queue.append(value)
+        
+    #查询当前队列里的最大值 直接返回队列前端也就是front就可以了。
+    def front(self):
+        return self.queue[0]
+    
+class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        que = MyQueue()
+        result = []
+        for i in range(k): #先将前k的元素放进队列
+            que.push(nums[i])
+        result.append(que.front()) #result 记录前k的元素的最大值
+        for i in range(k, len(nums)):
+            que.pop(nums[i - k]) #滑动窗口移除最前面元素
+            que.push(nums[i]) #滑动窗口前加入最后面的元素
+            result.append(que.front()) #记录对应的最大值
+        return result
+```
+
