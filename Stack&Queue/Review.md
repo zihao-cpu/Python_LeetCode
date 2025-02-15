@@ -194,3 +194,41 @@ class Solution:
         return "".join(res)  # 字符串拼接
 ```
 
+# 逆波兰表达式求值
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0150.%E9%80%86%E6%B3%A2%E5%85%B0%E8%A1%A8%E8%BE%BE%E5%BC%8F%E6%B1%82%E5%80%BC.md
+
+["10", "6", "9", "3", "+", "-11", " * ", "/", " * ", "17", "+", "5", "+"]
+
+```
+((10 * (6 / ((9 + 3) * -11))) + 17) + 5       
+= ((10 * (6 / (12 * -11))) + 17) + 5       
+= ((10 * (6 / -132)) + 17) + 5     
+= ((10 * 0) + 17) + 5     
+= (0 + 17) + 5    
+= 17 + 5    
+= 22  
+```
+
+```python
+from operator import add, sub, mul
+
+def div(x, y):
+    # 使用整数除法的向零取整方式
+    return int(x / y) if x * y > 0 else -(abs(x) // abs(y))
+
+class Solution(object):
+    op_map = {'+': add, '-': sub, '*': mul, '/': div}
+    
+    def evalRPN(self, tokens: List[str]) -> int:
+        stack = []
+        for token in tokens:
+            if token not in {'+', '-', '*', '/'}:
+                stack.append(int(token))
+            else:
+                op2 = stack.pop()
+                op1 = stack.pop()
+                stack.append(self.op_map[token](op1, op2))  # 第一个出来的在运算符后面
+        return stack.pop()
+```
+
