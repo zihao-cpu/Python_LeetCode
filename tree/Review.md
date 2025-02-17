@@ -245,3 +245,147 @@ class Solution:
         return root
 ```
 
+# 对称二叉树
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0101.%E5%AF%B9%E7%A7%B0%E4%BA%8C%E5%8F%89%E6%A0%91.md
+
+![101. 对称二叉树1](https://camo.githubusercontent.com/af0be100cd04a571c2f4ab50c3ba23c77326ee2ed2a8073df2aeacf130ba0fd6/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303230333134343632343431342e706e67)
+
+递归三部曲：
+
+1.确定递归函数和参数：因为我们要比较的是根节点的两个子树是否是相互翻转的，进而判断这个树是不是对称树，所以要比较的是两个树，参数自然也是左子树节点和右子树节点。
+
+```
+bool compare(TreeNode* left, TreeNode* right)
+```
+
+2.确定终止条件：要比较两个节点数值相不相同，首先要把两个节点为空的情况弄清楚！否则后面比较数值的时候就会操作空指针了。
+
+节点为空的情况有：（**注意我们比较的其实不是左孩子和右孩子，所以如下我称之为左节点右节点**）
+
+- 左节点为空，右节点不为空，不对称，return false
+- 左不为空，右为空，不对称 return false
+- 左右都为空，对称，返回true
+
+此时已经排除掉了节点为空的情况，那么剩下的就是左右节点不为空：
+
+- 左右都不为空，比较节点数值，不相同就return false
+
+此时左右节点不为空，且数值也不相同的情况我们也处理了。
+
+```
+if (left == NULL && right != NULL) return false;
+else if (left != NULL && right == NULL) return false;
+else if (left == NULL && right == NULL) return true;
+else if (left->val != right->val) return false; // 注意这里我没有使用else
+```
+
+3.确定单层递归逻辑：
+
+此时才进入单层递归的逻辑，单层递归的逻辑就是处理 左右节点都不为空，且数值相同的情况。
+
+- 比较二叉树外侧是否对称：传入的是左节点的左孩子，右节点的右孩子。
+- 比较内侧是否对称，传入左节点的右孩子，右节点的左孩子。
+- 如果左右都对称就返回true ，有一侧不对称就返回false 。
+
+```
+bool outside = compare(left->left, right->right);   // 左子树：左、 右子树：右
+bool inside = compare(left->right, right->left);    // 左子树：右、 右子树：左
+bool isSame = outside && inside;                    // 左子树：中、 右子树：中（逻辑处理）
+return isSame;
+```
+
+```python
+class Solution:
+    def isSymmetric(self, root: TreeNode) -> bool:
+        if not root:
+            return True
+        return self.compare(root.left, root.right)
+        
+    def compare(self, left, right):
+        #首先排除空节点的情况
+        if left == None and right != None: return False
+        elif left != None and right == None: return False
+        elif left == None and right == None: return True
+        #排除了空节点，再排除数值不相同的情况
+        elif left.val != right.val: return False
+        
+        #此时就是：左右节点都不为空，且数值相同的情况
+        #此时才做递归，做下一层的判断
+        outside = self.compare(left.left, right.right) #左子树：左、 右子树：右
+        inside = self.compare(left.right, right.left) #左子树：右、 右子树：左
+        isSame = outside and inside #左子树：中、 右子树：中 （逻辑处理）
+        return isSame
+```
+
+迭代法：
+
+![101.对称二叉树](https://camo.githubusercontent.com/d45272d4885e733b0b7a68e685bcccf036ddf54350b5b945054aaa8e1ee61d5f/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f676966732f3130312e2545352541462542392545372541372542302545342542412538432545352538462538392545362541302539312e676966)
+
+        1
+       / \
+      2   2
+     / \ / \
+    3  4 4  3
+1. **初始状态**：
+   - 队列：`[2, 2]`
+2. **第一次循环**：
+   - 取出 `2` 和 `2`，比较它们的值，相等。
+   - 将它们的子节点加入队列：`[3, 3, 4, 4]`
+3. **第二次循环**：
+   - 取出 `3` 和 `3`，比较它们的值，相等。
+   - 它们的子节点都为空，不加入队列。
+   - 队列状态：`[4, 4]`
+4. **第三次循环**：
+   - 取出 `4` 和 `4`，比较它们的值，相等。
+   - 它们的子节点都为空，不加入队列。
+   - 队列状态：`[]`
+
+```python
+import collections
+class Solution:
+    def isSymmetric(self, root: TreeNode) -> bool:
+        if not root:
+            return True
+        queue = collections.deque()
+        queue.append(root.left) #将左子树头结点加入队列
+        queue.append(root.right) #将右子树头结点加入队列
+        while queue: #接下来就要判断这这两个树是否相互翻转
+            leftNode = queue.popleft()
+            rightNode = queue.popleft()
+            if not leftNode and not rightNode: #左节点为空、右节点为空，此时说明是对称的
+                continue
+            
+            #左右一个节点不为空，或者都不为空但数值不相同，返回false
+            if not leftNode or not rightNode or leftNode.val != rightNode.val:
+                return False
+            queue.append(leftNode.left) #加入左节点左孩子
+            queue.append(rightNode.right) #加入右节点右孩子
+            queue.append(leftNode.right) #加入左节点右孩子
+            queue.append(rightNode.left) #加入右节点左孩子
+        return True
+```
+
+```python
+  #层序遍历 
+  def isSymmetric(self,root):
+        if not root:
+            return True
+        queue=collections.deque([root.left,root.right])
+        while queue:
+            if len(queue)%2!=0:
+                return False
+            level=[]
+            for _ in range(len(queue)):
+                cur=queue.popleft
+                if cur:
+                    level.append(cur.value)
+                    queue.append(cur.left)
+                    queue.append(cur.right)
+                else:
+                    level.append(None)
+            if level!=level[::-1]:return False
+
+        return True
+```
+
