@@ -187,7 +187,10 @@ class Solution:
                     queue.append(cur.right)
             result.append(level)
         return result
+    
 ```
+
+层次遍历里面的queue就是每一层的节点和level一样
 
 # 翻转二叉树
 
