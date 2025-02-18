@@ -325,6 +325,10 @@ class Solution:
 
 ![101.对称二叉树](https://camo.githubusercontent.com/d45272d4885e733b0b7a68e685bcccf036ddf54350b5b945054aaa8e1ee61d5f/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f676966732f3130312e2545352541462542392545372541372542302545342542412538432545352538462538392545362541302539312e676966)
 
+
+
+
+
         1
        / \
       2   2
@@ -390,5 +394,157 @@ class Solution:
             if level!=level[::-1]:return False
 
         return True
+```
+
+# 二叉树的最大深度
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0104.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%A4%A7%E6%B7%B1%E5%BA%A6.md
+
+采用后序遍历
+
+递归三部曲
+
+1.确定递归函数和参数：确定递归函数的参数和返回值：参数就是传入树的根节点，返回就返回这棵树的深度，所以返回值为int类型。
+
+```
+int getdepth(TreeNode* node)
+```
+
+2.确定终止条件：如果为空节点的话，就返回0，表示高度为0。
+
+```
+if (node == NULL) return 0;
+```
+
+3.确定单层递归的逻辑：先求它的左子树的深度，再求右子树的深度，最后取左右深度最大的数值 再+1 （加1是因为算上当前中间节点）就是目前节点为根节点的树的深度。
+
+```
+int leftdepth = getdepth(node->left);       // 左
+int rightdepth = getdepth(node->right);     // 右
+int depth = 1 + max(leftdepth, rightdepth); // 中
+return depth;
+```
+
+```python
+class Solution:
+    def maxdepth(self, root: treenode) -> int:
+        return self.getdepth(root)
+        
+    def getdepth(self, node):
+        if not node:
+            return 0
+        leftheight = self.getdepth(node.left) #左
+        rightheight = self.getdepth(node.right) #右
+        height = 1 + max(leftheight, rightheight) #中
+        return height
+```
+
+迭代层次遍历
+
+```python
+class Solution:
+    def maxDepth(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        
+        depth = 0
+        queue = collections.deque([root])
+        
+        while queue:
+            depth += 1
+            for _ in range(len(queue)):
+                node = queue.popleft()
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+        
+        return depth
+```
+
+# 二叉树的最小深度
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0111.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E6%B7%B1%E5%BA%A6.md
+
+递归三部曲：
+
+1.确定递归函数和参数：参数为要传入的二叉树根节点，返回的是int类型的深度。
+
+```
+int getDepth(TreeNode* node)
+```
+
+2.确定终止条件：
+
+```
+if (node == NULL) return 0;
+```
+
+3.确定单层递归逻辑
+
+```
+int leftDepth = getDepth(node->left);           // 左
+int rightDepth = getDepth(node->right);         // 右
+                                                // 中
+// 当一个左子树为空，右不为空，这时并不是最低点
+if (node->left == NULL && node->right != NULL) { 
+    return 1 + rightDepth;
+}   
+// 当一个右子树为空，左不为空，这时并不是最低点
+if (node->left != NULL && node->right == NULL) { 
+    return 1 + leftDepth;
+}
+int result = 1 + min(leftDepth, rightDepth);
+return result;
+```
+
+```python
+class Solution:
+    def getDepth(self, node):
+        if node is None:
+            return 0
+        leftDepth = self.getDepth(node.left)  # 左
+        rightDepth = self.getDepth(node.right)  # 右
+        
+        # 当一个左子树为空，右不为空，这时并不是最低点
+        if node.left is None and node.right is not None:
+            return 1 + rightDepth
+        
+        # 当一个右子树为空，左不为空，这时并不是最低点
+        if node.left is not None and node.right is None:
+            return 1 + leftDepth
+        
+        result = 1 + min(leftDepth, rightDepth)
+        return result
+
+    def minDepth(self, root):
+        return self.getDepth(root)
+```
+
+迭代法
+
+```python
+class Solution:
+    def minDepth(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        depth = 0
+        queue = collections.deque([root])
+        
+        while queue:
+            depth += 1 
+            for _ in range(len(queue)):
+                node = queue.popleft()
+                
+                if not node.left and not node.right:
+                    return depth
+            
+                if node.left:
+                    queue.append(node.left)
+                    
+                if node.right:
+                    queue.append(node.right)
+
+        return depth
 ```
 
