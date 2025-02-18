@@ -192,7 +192,7 @@ class Solution:
 
 层次遍历里面的queue就是每一层的节点和level一样
 
-# 翻转二叉树
+# 翻转二叉树(前序遍历)
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0226.%E7%BF%BB%E8%BD%AC%E4%BA%8C%E5%8F%89%E6%A0%91.md
 
@@ -248,7 +248,7 @@ class Solution:
         return root
 ```
 
-# 对称二叉树
+# 对称二叉树(层序遍历)
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0101.%E5%AF%B9%E7%A7%B0%E4%BA%8C%E5%8F%89%E6%A0%91.md
 
@@ -396,7 +396,7 @@ class Solution:
         return True
 ```
 
-# 二叉树的最大深度
+# 二叉树的最大深度(后序遍历)
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0104.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%A4%A7%E6%B7%B1%E5%BA%A6.md
 
@@ -462,7 +462,7 @@ class Solution:
         return depth
 ```
 
-# 二叉树的最小深度
+# 二叉树的最小深度(后序遍历)
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0111.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E6%B7%B1%E5%BA%A6.md
 
@@ -546,5 +546,279 @@ class Solution:
                     queue.append(node.right)
 
         return depth
+```
+
+# 平衡二叉树(后序遍历)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0110.%E5%B9%B3%E8%A1%A1%E4%BA%8C%E5%8F%89%E6%A0%91.md
+
+一棵高度平衡二叉树定义为：一个二叉树每个节点 的左右两个子树的高度差的绝对值不超过1
+
+- 二叉树节点的深度：指从根节点到该节点的最长简单路径边的条数。
+- 二叉树节点的高度：指从该节点到叶子节点的最长简单路径边的条数
+
+**此时大家应该明白了既然要求比较高度，必然是要后序遍历。**
+
+递归三部曲：
+
+1.确定递归函数和参数：参数：当前传入节点。 返回值：以当前传入节点为根节点的树的高度。
+
+那么如何标记左右子树是否差值大于1呢？
+
+如果当前传入节点为根节点的二叉树已经不是二叉平衡树了，还返回高度的话就没有意义了。
+
+所以如果已经不是二叉平衡树了，可以返回-1 来标记已经不符合平衡树的规则了。
+
+```
+// -1 表示已经不是平衡二叉树了，否则返回值是以该节点为根节点树的高度
+int getHeight(TreeNode* node)
+```
+
+2.确定终止条件：
+
+```
+if (node == NULL) {
+    return 0;
+}
+```
+
+3.确定单层递归逻辑
+
+```
+int leftHeight = getHeight(node->left); // 左
+if (leftHeight == -1) return -1;
+int rightHeight = getHeight(node->right); // 右
+if (rightHeight == -1) return -1;
+
+int result;
+if (abs(leftHeight - rightHeight) > 1) {  // 中
+    result = -1;
+} else {
+    result = 1 + max(leftHeight, rightHeight); // 以当前节点为根节点的树的最大高度
+}
+
+return result;
+```
+
+```python
+class Solution:
+    def isBalanced(self, root: TreeNode) -> bool:
+        if self.get_height(root) != -1:
+            return True
+        else:
+            return False
+
+    def get_height(self, root: TreeNode) -> int:
+        # Base Case
+        if not root:
+            return 0
+        # 左
+        if (left_height := self.get_height(root.left)) == -1:
+            return -1
+        # 右
+        if (right_height := self.get_height(root.right)) == -1:
+            return -1
+        # 中
+        if abs(left_height - right_height) > 1:
+            return -1
+        else:
+            return 1 + max(left_height, right_height)
+```
+
+# 二叉树的所有路径(前序遍历)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0257.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%89%80%E6%9C%89%E8%B7%AF%E5%BE%84.md
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+要传入根节点，记录每一条路径的path，和存放结果集的result，这里递归不需要返回值，代码如下：
+
+```
+void traversal(TreeNode* cur, vector<int>& path, vector<string>& result)
+```
+
+2.确定终止条件：
+
+```
+if (cur->left == NULL && cur->right == NULL) {
+    终止处理逻辑
+}
+确定终止条件并完成拼接
+if (cur->left == NULL && cur->right == NULL) { // 遇到叶子节点
+    string sPath;
+    for (int i = 0; i < path.size() - 1; i++) { // 将path里记录的路径转为string格式
+        sPath += to_string(path[i]);
+        sPath += "->";
+    }
+    sPath += to_string(path[path.size() - 1]); // 记录最后一个节点（叶子节点）
+    result.push_back(sPath); // 收集一个路径
+    return;
+}
+
+```
+
+3.确定单层递归逻辑
+
+**回溯和递归是一一对应的，有一个递归，就要有一个回溯**，**所以回溯要和递归永远在一起**
+
+```
+if (cur->left) {
+    traversal(cur->left, path, result);
+    path.pop_back(); // 回溯
+}
+if (cur->right) {
+    traversal(cur->right, path, result);
+    path.pop_back(); // 回溯
+}
+```
+
+```python
+# Definition for a binary tree node.
+class Solution:
+    def traversal(self, cur, path, result):
+        path.append(cur.val)  # 中
+        if not cur.left and not cur.right:  # 到达叶子节点
+            sPath = '->'.join(map(str, path))
+            result.append(sPath)
+            return
+        if cur.left:  # 左
+            self.traversal(cur.left, path, result)
+            path.pop()  # 回溯
+        if cur.right:  # 右
+            self.traversal(cur.right, path, result)
+            path.pop()  # 回溯
+
+    def binaryTreePaths(self, root):
+        result = []
+        path = []
+        if not root:
+            return result
+        self.traversal(root, path, result)
+        return result
+```
+
+迭代法
+
+```
+        cur = stack.pop()
+        path = path_st.pop()
+        关键在于一起弹出来
+```
+```python
+class Solution:
+
+    def binaryTreePaths(self, root: TreeNode) -> List[str]:
+        # 题目中节点数至少为1
+        stack, path_st, result = [root], [str(root.val)], []
+
+        while stack:
+            cur = stack.pop()
+            path = path_st.pop()
+            # 如果当前节点为叶子节点，添加路径到结果中
+            if not (cur.left or cur.right):
+                result.append(path)
+            if cur.right:
+                stack.append(cur.right)
+                path_st.append(path + '->' + str(cur.right.val))
+            if cur.left:
+                stack.append(cur.left)
+                path_st.append(path + '->' + str(cur.left.val))
+
+        return result
+```
+
+# 相同的树
+
+```python
+class Solution:
+    def isSameTree(self, p: TreeNode, q: TreeNode) -> bool:
+        return self.compare(p, q)
+        
+    def compare(self, tree1, tree2):
+        if not tree1 and tree2:
+            return False
+        elif tree1 and not tree2:
+            return False
+        elif not tree1 and not tree2:
+            return True
+        elif tree1.val != tree2.val: #注意这里我没有使用else
+            return False
+        
+        #此时就是：左右节点都不为空，且数值相同的情况
+        #此时才做递归，做下一层的判断
+        compareLeft = self.compare(tree1.left, tree2.left) #左子树：左、 右子树：左
+        compareRight = self.compare(tree1.right, tree2.right) #左子树：右、 右子树：右
+        isSame = compareLeft and compareRight #左子树：中、 右子树：中（逻辑处理）
+        return isSame
+```
+
+# 左叶子之和(前序遍历)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0404.%E5%B7%A6%E5%8F%B6%E5%AD%90%E4%B9%8B%E5%92%8C.md
+
+因为题目中其实没有说清楚左叶子究竟是什么节点，那么我来给出左叶子的明确定义：**节点A的左孩子不为空，且左孩子的左右孩子都为空（说明是叶子节点），那么A节点的左孩子为左叶子节点**
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+判断一个树的左叶子节点之和，那么一定要传入树的根节点，递归函数的返回值为数值之和，所以为int
+
+```
+int sumOfLeftLeaves(TreeNode* root)
+```
+
+2.确定终止条件
+
+```
+        if (root == NULL) return 0;
+        if (root->left == NULL && root->right== NULL) return 0;
+```
+
+3.确定单层递归逻辑
+
+当遇到左叶子节点的时候，记录数值，然后通过递归求取左子树左叶子之和，和 右子树左叶子之和，相加便是整个树的左叶子之和。
+
+```
+        if (root->left != NULL && root->left->left == NULL && root->left->right == NULL) {
+            curleftValue = root->left->val;
+        }
+        curleftValue + sumOfLeftLeaves(root->left) + sumOfLeftLeaves(root->right)
+```
+
+```python
+class Solution:
+    def sumOfLeftLeaves(self, root):
+        if root is None:
+            return 0
+        leftValue = 0
+        if root.left is not None and root.left.left is None and root.left.right is None:
+            leftValue = root.left.val
+        return leftValue + self.sumOfLeftLeaves(root.left) + self.sumOfLeftLeaves(root.right)
+
+```
+
+迭代法：
+
+弹出的时候判断
+
+```python
+class Solution:
+    def sumOfLeftLeaves(self, root):
+        if root is None:
+            return 0
+        st = [root]
+        result = 0
+        while st:
+            node = st.pop()
+            if node.left and node.left.left is None and node.left.right is None:
+                result += node.left.val
+            if node.right:
+                st.append(node.right)
+            if node.left:
+                st.append(node.left)
+        return result
 ```
 
