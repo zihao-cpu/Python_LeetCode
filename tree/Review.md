@@ -804,6 +804,8 @@ class Solution:
 
 弹出的时候判断
 
+
+
 ```python
 class Solution:
     def sumOfLeftLeaves(self, root):
@@ -820,5 +822,220 @@ class Solution:
             if node.left:
                 st.append(node.left)
         return result
+```
+
+# 找树左下角的值(层次遍历)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0513.%E6%89%BE%E6%A0%91%E5%B7%A6%E4%B8%8B%E8%A7%92%E7%9A%84%E5%80%BC.md
+
+层次遍历最简单
+
+**找到最后一行的第一个数**
+
+```python
+from collections import deque
+class Solution:
+    def findBottomLeftValue(self, root):
+        if root is None:
+            return 0
+        queue = deque()
+        queue.append(root)
+        result = 0
+        while queue:
+            size = len(queue)
+            for i in range(size):
+                node = queue.popleft()
+                if i == 0:
+                    result = node.val
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+        return result
+```
+
+# 路径总和(前序遍历)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0112.%E8%B7%AF%E5%BE%84%E6%80%BB%E5%92%8C.md
+
+递归三部曲：
+
+1.确定递归函数和参数：参数：需要二叉树的根节点，还需要一个计数器，这个计数器用来计算二叉树的一条边之和是否正好是目标和，计数器为int型。
+
+- **如果要搜索其中一条符合条件的路径，那么递归一定需要返回值，因为遇到符合条件的路径了就要及时返回。（本题的情况）**
+
+  ​
+
+2.确定终止条件：
+
+首先计数器如何统计这一条路径的和呢？
+
+不要去累加然后判断是否等于目标和，那么代码比较麻烦，可以用递减，让计数器count初始为目标和，然后每次减去遍历路径节点上的数值。
+
+如果最后count == 0，同时到了叶子节点的话，说明找到了目标和。
+
+如果遍历到了叶子节点，count不为0，就是没找到。
+
+递归终止条件代码如下：
+
+```
+if (!cur->left && !cur->right && count == 0) return true; // 遇到叶子节点，并且计数为0
+if (!cur->left && !cur->right) return false; // 遇到叶子节点而没有找到合适的边，直接返回
+```
+
+3.确定单层递归逻辑：
+
+因为终止条件是判断叶子节点，所以递归的过程中就不要让空节点进入递归了。
+
+递归函数是有返回值的，如果递归函数返回true，说明找到了合适的路径，应该立刻返回。
+
+```
+if (cur->left) { // 左 （空节点不遍历）
+    // 遇到叶子节点返回true，则直接返回true
+    if (traversal(cur->left, count - cur->left->val)) return true; // 注意这里有回溯的逻辑
+}
+if (cur->right) { // 右 （空节点不遍历）
+    // 遇到叶子节点返回true，则直接返回true
+    if (traversal(cur->right, count - cur->right->val)) return true; // 注意这里有回溯的逻辑
+}
+return false;
+```
+
+```
+if (cur->left) { // 左
+    count -= cur->left->val; // 递归，处理节点;
+    if (traversal(cur->left, count)) return true;
+    count += cur->left->val; // 回溯，撤销处理结果
+}
+if (cur->right) { // 右
+    count -= cur->right->val;
+    if (traversal(cur->right, count)) return true;
+    count += cur->right->val;
+}
+return false;
+```
+
+```python
+class Solution:
+    def traversal(self, cur: TreeNode, count: int) -> bool:
+        if not cur.left and not cur.right and count == 0: # 遇到叶子节点，并且计数为0
+            return True
+        if not cur.left and not cur.right: # 遇到叶子节点直接返回
+            return False
+        
+        if cur.left: # 左
+            count -= cur.left.val
+            if self.traversal(cur.left, count): # 递归，处理节点
+                return True
+            count += cur.left.val # 回溯，撤销处理结果
+            
+        if cur.right: # 右
+            count -= cur.right.val
+            if self.traversal(cur.right, count): # 递归，处理节点
+                return True
+            count += cur.right.val # 回溯，撤销处理结果
+            
+        return False
+    
+    def hasPathSum(self, root: TreeNode, sum: int) -> bool:
+        if root is None:
+            return False
+        return self.traversal(root, sum - root.val)      
+```
+
+迭代法，思想和二叉树的所有路径一样
+
+```python
+class Solution:
+    def hasPathSum(self, root: TreeNode, sum: int) -> bool:
+        if not root:
+            return False
+        # 此时栈里要放的是pair<节点指针，路径数值>
+        st = [(root, root.val)]
+        while st:
+            node, path_sum = st.pop()
+            # 如果该节点是叶子节点了，同时该节点的路径数值等于sum，那么就返回true
+            if not node.left and not node.right and path_sum == sum:
+                return True
+            # 右节点，压进去一个节点的时候，将该节点的路径数值也记录下来
+            if node.right:
+                st.append((node.right, path_sum + node.right.val))
+            # 左节点，压进去一个节点的时候，将该节点的路径数值也记录下来
+            if node.left:
+                st.append((node.left, path_sum + node.left.val))
+        return False
+```
+
+# 从中序与后序遍历序列构造二叉树
+
+![106.从中序与后序遍历序列构造二叉树](https://camo.githubusercontent.com/0b007e4086174a2587b02c3ea8eaa8dba0534ab8e639a2907e13047917cd9db5/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303230333135343234393836302e706e67)
+
+来看一下一共分几步：
+
+- 第一步：如果数组大小为零的话，说明是空节点了。
+- 第二步：如果不为空，那么取后序数组最后一个元素作为节点元素。
+- 第三步：找到后序数组最后一个元素在中序数组的位置，作为切割点
+- 第四步：切割中序数组，切成中序左数组和中序右数组 （顺序别搞反了，一定是先切中序数组）
+- 第五步：切割后序数组，切成后序左数组和后序右数组
+- 第六步：递归处理左区间和右区间
+
+```
+TreeNode* traversal (vector<int>& inorder, vector<int>& postorder) {
+
+    // 第一步
+    if (postorder.size() == 0) return NULL;
+
+    // 第二步：后序遍历数组最后一个元素，就是当前的中间节点
+    int rootValue = postorder[postorder.size() - 1];
+    TreeNode* root = new TreeNode(rootValue);
+
+    // 叶子节点
+    if (postorder.size() == 1) return root;
+
+    // 第三步：找切割点
+    int delimiterIndex;
+    for (delimiterIndex = 0; delimiterIndex < inorder.size(); delimiterIndex++) {
+        if (inorder[delimiterIndex] == rootValue) break;
+    }
+
+    // 第四步：切割中序数组，得到 中序左数组和中序右数组
+    // 第五步：切割后序数组，得到 后序左数组和后序右数组
+
+    // 第六步
+    root->left = traversal(中序左数组, 后序左数组);
+    root->right = traversal(中序右数组, 后序右数组);
+
+    return root;
+}
+```
+
+```python
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        # 第一步: 特殊情况讨论: 树为空. (递归终止条件)
+        if not postorder:
+            return None
+
+        # 第二步: 后序遍历的最后一个就是当前的中间节点.
+        root_val = postorder[-1]
+        root = TreeNode(root_val)
+
+        # 第三步: 找切割点.
+        separator_idx = inorder.index(root_val)
+
+        # 第四步: 切割inorder数组. 得到inorder数组的左,右半边.
+        inorder_left = inorder[:separator_idx]
+        inorder_right = inorder[separator_idx + 1:]
+
+        # 第五步: 切割postorder数组. 得到postorder数组的左,右半边.
+        # ⭐️ 重点1: 中序数组大小一定跟后序数组大小是相同的.
+        postorder_left = postorder[:len(inorder_left)]
+        postorder_right = postorder[len(inorder_left): len(postorder) - 1]
+
+        # 第六步: 递归
+        root.left = self.buildTree(inorder_left, postorder_left)
+        root.right = self.buildTree(inorder_right, postorder_right)
+         # 第七步: 返回答案
+        return root
 ```
 
