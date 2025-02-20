@@ -323,9 +323,7 @@ class Solution:
 
 迭代法：
 
-![101.对称二叉树](https://camo.githubusercontent.com/d45272d4885e733b0b7a68e685bcccf036ddf54350b5b945054aaa8e1ee61d5f/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f676966732f3130312e2545352541462542392545372541372542302545342542412538432545352538462538392545362541302539312e676966)
-
-
+![101.对称二叉树](https://camo.githubusercontent.com/d45272d4885e733b0b7a68e685bcccf036ddf54350b5b945054aaa8e1ee61d5f/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f676966732f3130312e2545352541462542392545372541372542302545342542412538432545352538462538392545362541302539312e676966
 
 
 
@@ -1105,5 +1103,90 @@ class Solution:
         node.left = self.constructMaximumBinaryTree(nums[:max_index])
         node.right = self.constructMaximumBinaryTree(nums[max_index+1:])
         return node
+```
+
+# 合并二叉树(前序遍历+层次遍历)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0617.%E5%90%88%E5%B9%B6%E4%BA%8C%E5%8F%89%E6%A0%91.md
+
+递归三部曲
+
+1.确定递归函数和参数：首先要合入两个二叉树，那么参数至少是要传入两个二叉树的根节点，返回值就是合并之后二叉树的根节点。
+
+```
+TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
+```
+
+2.确定终止条件：因为是传入了两个树，那么就有两个树遍历的节点t1 和 t2，如果t1 == NULL 了，两个树合并就应该是 t2 了（如果t2也为NULL也无所谓，合并之后就是NULL）。
+
+反过来如果t2 == NULL，那么两个数合并就是t1（如果t1也为NULL也无所谓，合并之后就是NULL）。
+
+```
+if (t1 == NULL) return t2; // 如果t1为空，合并之后就应该是t2
+if (t2 == NULL) return t1; // 如果t2为空，合并之后就应该是t1
+```
+
+3.单层递归逻辑
+
+单层递归的逻辑就比较好写了，这里我们重复利用一下t1这个树，t1就是合并之后树的根节点（就是修改了原来树的结构）。
+
+那么单层递归中，就要把两棵树的元素加到一起。
+
+```
+t1->val += t2->val;
+t1->left = mergeTrees(t1->left, t2->left);
+t1->right = mergeTrees(t1->right, t2->right);
+return t1;
+```
+
+```python
+class Solution:
+    def mergeTrees(self, root1: TreeNode, root2: TreeNode) -> TreeNode:
+        # 递归终止条件: 
+        #  但凡有一个节点为空, 就立刻返回另外一个. 如果另外一个也为None就直接返回None. 
+        if not root1: 
+            return root2
+        if not root2: 
+            return root1
+        # 上面的递归终止条件保证了代码执行到这里root1, root2都非空. 
+        root1.val += root2.val # 中
+        root1.left = self.mergeTrees(root1.left, root2.left) #左
+        root1.right = self.mergeTrees(root1.right, root2.right) # 右
+        
+        return root1
+```
+
+迭代法
+
+和对称二叉树解题类似
+
+```python
+from collections import deque
+
+class Solution:
+    def mergeTrees(self, root1: TreeNode, root2: TreeNode) -> TreeNode:
+        if not root1:
+            return root2
+        if not root2:
+            return root1
+
+        queue = deque()
+        queue.append((root1, root2))
+
+        while queue:
+            node1, node2 = queue.popleft()
+            node1.val += node2.val
+
+            if node1.left and node2.left:
+                queue.append((node1.left, node2.left))
+            elif not node1.left:
+                node1.left = node2.left
+
+            if node1.right and node2.right:
+                queue.append((node1.right, node2.right))
+            elif not node1.right:
+                node1.right = node2.right
+
+        return root1
 ```
 
