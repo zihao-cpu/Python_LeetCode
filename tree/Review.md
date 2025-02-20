@@ -1190,3 +1190,93 @@ class Solution:
         return root1
 ```
 
+# 二叉搜索树
+
+二叉搜索树是一个有序树：
+
+- 若它的左子树不空，则左子树上所有结点的值均小于它的根结点的值；
+- 若它的右子树不空，则右子树上所有结点的值均大于它的根结点的值；
+- 它的左、右子树也分别为二叉搜索树
+
+# 二叉搜索树中的搜索
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0700.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E6%90%9C%E7%B4%A2.md
+
+![700.二叉搜索树中的搜索](https://camo.githubusercontent.com/cf55fdf9637675b74a15c3d3372691529f3abc26048901ea5f1e01701100783d/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303230343135353532323437362e706e67)
+
+递归三部曲
+
+1.确定递归函数和参数：递归函数的参数传入的就是根节点和要搜索的数值，返回的就是以这个搜索数值所在的节点。
+
+```
+TreeNode* searchBST(TreeNode* root, int val)
+```
+
+2.确定终止条件：如果root为空，或者找到这个数值了，就返回root节点。
+
+```
+if (root == NULL || root->val == val) return root;
+```
+
+3.确定单层递归逻辑
+
+看看二叉搜索树的单层递归逻辑有何不同。
+
+因为二叉搜索树的节点是有序的，所以可以有方向的去搜索。
+
+如果root->val > val，搜索左子树，如果root->val < val，就搜索右子树，最后如果都没有搜索到，就返回NULL。
+
+```
+TreeNode* result = NULL;
+if (root->val > val) result = searchBST(root->left, val);
+if (root->val < val) result = searchBST(root->right, val);
+return result;
+```
+
+```python
+class Solution:
+    def searchBST(self, root: TreeNode, val: int) -> TreeNode:
+        # 为什么要有返回值: 
+        #   因为搜索到目标节点就要立即return，
+        #   这样才是找到节点就返回（搜索某一条边），如果不加return，就是遍历整棵树了。
+
+        if not root or root.val == val: 
+            return root
+
+        if root.val > val: 
+            return self.searchBST(root.left, val)
+
+        if root.val < val: 
+            return self.searchBST(root.right, val)
+```
+
+迭代法：
+
+```python
+class Solution:
+    def searchBST(self, root: TreeNode, val: int) -> TreeNode:
+        while root:
+            if val < root.val: root = root.left
+            elif val > root.val: root = root.right
+            else: return root
+        return None
+```
+
+```python
+class Solution:
+    def searchBST(self, root: TreeNode, val: int) -> TreeNode:
+        stack = [root]
+        while stack:
+            node = stack.pop()
+            # 根据TreeNode的定义
+            # node携带有三类信息 node.left/node.right/node.val
+            # 找到val直接返回node 即是找到了该节点为根的子树
+            # 此处node.left/node.right/val的前后顺序可打乱
+            if node.val == val: 
+                return node
+            if node.right:
+                stack.append(node.right)
+            if node.left:
+                stack.append(node.left)
+        return None
+```
