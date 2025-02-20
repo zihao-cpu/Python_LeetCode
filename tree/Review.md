@@ -1039,3 +1039,71 @@ class Solution:
         return root
 ```
 
+# 最大二叉树
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0654.%E6%9C%80%E5%A4%A7%E4%BA%8C%E5%8F%89%E6%A0%91.md
+
+递归三部曲
+
+1.确定递归函数和参数：参数传入的是存放元素的数组，返回该数组构造的二叉树的头结点，返回类型是指向节点的指针。
+
+```
+TreeNode* constructMaximumBinaryTree(vector<int>& nums)
+```
+
+2.确定终止条件
+
+判断nums是否为空
+
+3.确定单层递归逻辑
+
+1.先要找到数组中最大的值和对应的下标， 最大的值构造根节点，下标用来下一步分割数组。
+
+```
+int maxValue = 0;
+int maxValueIndex = 0;
+for (int i = 0; i < nums.size(); i++) {
+    if (nums[i] > maxValue) {
+        maxValue = nums[i];
+        maxValueIndex = i;
+    }
+}
+TreeNode* node = new TreeNode(0);
+node->val = maxValue;
+```
+
+2.最大值所在的下标左区间 构造左子树
+
+这里要判断maxValueIndex > 0，因为要保证左区间至少有一个数值。
+
+```
+if (maxValueIndex > 0) {
+    vector<int> newVec(nums.begin(), nums.begin() + maxValueIndex);
+    node->left = constructMaximumBinaryTree(newVec);
+}
+```
+
+3.最大值所在的下标右区间 构造右子树
+
+判断maxValueIndex < (nums.size() - 1)，确保右区间至少有一个数值。
+
+```
+if (maxValueIndex < (nums.size() - 1)) {
+    vector<int> newVec(nums.begin() + maxValueIndex + 1, nums.end());
+    node->right = constructMaximumBinaryTree(newVec);
+}
+```
+
+```python
+class Solution:
+    def constructMaximumBinaryTree(self, nums: List[int]) -> TreeNode:
+        if not nums:
+            return None
+        max_val = max(nums)
+        max_index = nums.index(max_val)
+        node = TreeNode(max_val)
+        node.left = self.constructMaximumBinaryTree(nums[:max_index])
+        node.right = self.constructMaximumBinaryTree(nums[max_index+1:])
+        return node
+```
+
