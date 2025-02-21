@@ -1280,3 +1280,53 @@ class Solution:
                 stack.append(node.left)
         return None
 ```
+
+# 验证二叉搜索树(中序遍历)
+
+要知道中序遍历下，输出的二叉搜索树节点的数值是有序序列。
+
+有了这个特性，**验证二叉搜索树，就相当于变成了判断一个序列是不是递增的了。**
+
+```python
+class Solution:
+    def __init__(self):
+        self.vec = []
+
+    def traversal(self, root):
+        if root is None:
+            return
+        self.traversal(root.left)
+        self.vec.append(root.val)  # 将二叉搜索树转换为有序数组
+        self.traversal(root.right)
+
+    def isValidBST(self, root):
+        self.vec = []  # 清空数组
+        self.traversal(root)
+        for i in range(1, len(self.vec)):
+            # 注意要小于等于，搜索树里不能有相同元素
+            if self.vec[i] <= self.vec[i - 1]:
+                return False
+        return True
+```
+
+迭代法：
+
+```python
+class Solution:
+    def isValidBST(self, root):
+        stack = []
+        cur = root
+        pre = None  # 记录前一个节点
+        while cur is not None or len(stack) > 0:
+            if cur is not None:
+                stack.append(cur)
+                cur = cur.left  # 左
+            else:
+                cur = stack.pop()  # 中
+                if pre is not None and cur.val <= pre.val:
+                    return False
+                pre = cur  # 保存前一个访问的结点
+                cur = cur.right  # 右
+        return True
+```
+
