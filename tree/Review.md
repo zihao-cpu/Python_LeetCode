@@ -1330,3 +1330,59 @@ class Solution:
         return True
 ```
 
+# 二叉搜索树的最小绝对差
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0530.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E6%9C%80%E5%B0%8F%E7%BB%9D%E5%AF%B9%E5%B7%AE.md
+
+题目中要求在二叉搜索树上任意两节点的差的绝对值的最小值。
+
+**注意是二叉搜索树**，二叉搜索树可是有序的。
+
+遇到在二叉搜索树上求什么最值啊，差值之类的，就把它想成在一个有序数组上求最值，求差值，这样就简单多了。
+
+```python
+class Solution:
+    def __init__(self):
+        self.vec = []
+
+    def traversal(self, root):
+        if root is None:
+            return
+        self.traversal(root.left)
+        self.vec.append(root.val)  # 将二叉搜索树转换为有序数组
+        self.traversal(root.right)
+
+    def getMinimumDifference(self, root):
+        self.vec = []
+        self.traversal(root)
+        if len(self.vec) < 2:
+            return 0
+        result = float('inf')
+        for i in range(1, len(self.vec)):
+            # 统计有序数组的最小差值
+            result = min(result, self.vec[i] - self.vec[i - 1])
+        return result
+```
+
+迭代法 + 记录前一个节点的指针
+
+```python
+class Solution:
+    def __init__(self):
+        self.result = float('inf')
+        self.pre = None
+
+    def traversal(self, cur):
+        if cur is None:
+            return
+        self.traversal(cur.left)  # 左
+        if self.pre is not None:  # 中
+            self.result = min(self.result, cur.val - self.pre.val)
+        self.pre = cur  # 记录前一个
+        self.traversal(cur.right)  # 右
+
+    def getMinimumDifference(self, root):
+        self.traversal(root)
+        return self.result
+```
+
