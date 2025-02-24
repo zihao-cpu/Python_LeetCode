@@ -1418,6 +1418,8 @@ class Solution:
 
 # 二叉树的最近公共祖先(后序遍历)
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0236.%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88.md
+
 情况一：**如果找到一个节点，发现左子树出现结点p，右子树出现节点q，或者 左子树出现结点q，右子树出现节点p，那么该节点就是节点p和q的最近公共祖先。**
 
 判断逻辑是 如果递归遍历遇到q，就将q返回，遇到p 就将p返回，那么如果 左右子树的返回值都不为空，说明此时的中节点，一定是q 和p 的最近祖先。
@@ -1475,3 +1477,93 @@ class Solution:
 
 ![236.二叉树的最近公共祖先2](https://camo.githubusercontent.com/8aaf71724e838ca2fd761f10b83ec4bffe8bc48054868a012d3378fd1d34fccb/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f3230323130323034313531323538322e706e67)
 
+# 二叉搜索树的最近公共祖先
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0235.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E7%9A%84%E6%9C%80%E8%BF%91%E5%85%AC%E5%85%B1%E7%A5%96%E5%85%88.md
+
+
+
+```python
+class Solution:
+    def traversal(self, cur, p, q):
+        if cur is None:
+            return cur
+                                                        # 中
+        if cur.val > p.val and cur.val > q.val:           # 左
+            left = self.traversal(cur.left, p, q)
+            if left is not None:
+                return left
+
+        if cur.val < p.val and cur.val < q.val:           # 右
+            right = self.traversal(cur.right, p, q)
+            if right is not None:
+                return right
+
+        return cur
+
+    def lowestCommonAncestor(self, root, p, q):
+        return self.traversal(root, p, q)
+```
+
+迭代法：
+
+```python
+class Solution:
+    def lowestCommonAncestor(self, root, p, q):
+        if root.val > p.val and root.val > q.val:
+            return self.lowestCommonAncestor(root.left, p, q)
+        elif root.val < p.val and root.val < q.val:
+            return self.lowestCommonAncestor(root.right, p, q)
+        else:
+            return root
+```
+
+# 二叉树中的插入操作
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0701.%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E6%8F%92%E5%85%A5%E6%93%8D%E4%BD%9C.md
+
+
+
+```python
+class Solution:
+    def insertIntoBST(self, root, val):
+        if root is None:
+            node = TreeNode(val)
+            return node
+
+        if root.val > val:
+            root.left = self.insertIntoBST(root.left, val)
+        if root.val < val:
+            root.right = self.insertIntoBST(root.right, val)
+
+        return root
+```
+
+
+
+
+
+```python
+class Solution:
+    def insertIntoBST(self, root, val):
+        if root is None:  # 如果根节点为空，创建新节点作为根节点并返回
+            node = TreeNode(val)
+            return node
+
+        cur = root
+        parent = root  # 记录上一个节点，用于连接新节点
+        while cur is not None:
+            parent = cur
+            if cur.val > val:
+                cur = cur.left
+            else:
+                cur = cur.right
+
+        node = TreeNode(val)
+        if val < parent.val:
+            parent.left = node  # 将新节点连接到父节点的左子树
+        else:
+            parent.right = node  # 将新节点连接到父节点的右子树
+
+        return root       
+```
