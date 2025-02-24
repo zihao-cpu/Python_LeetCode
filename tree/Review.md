@@ -1416,3 +1416,62 @@ class Solution:
         return result
 ```
 
+# 二叉树的最近公共祖先(后序遍历)
+
+情况一：**如果找到一个节点，发现左子树出现结点p，右子树出现节点q，或者 左子树出现结点q，右子树出现节点p，那么该节点就是节点p和q的最近公共祖先。**
+
+判断逻辑是 如果递归遍历遇到q，就将q返回，遇到p 就将p返回，那么如果 左右子树的返回值都不为空，说明此时的中节点，一定是q 和p 的最近祖先。
+
+情况二：**就是节点本身p(q)，它拥有一个子孙节点q(p)。**
+
+1.确定递归函数以及参数
+
+```
+TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q)
+```
+
+2.确定终止条件
+
+遇到空的话，因为树都是空了，所以返回空。
+
+那么我们来说一说，如果 root == q，或者 root == p，说明找到 q p ，则将其返回，这个返回值，后面在中节点的处理过程中会用到，那么中节点的处理逻辑，下面讲解。
+
+```
+if (root == q || root == p || root == NULL) return root;
+```
+
+3.确定单层递归逻辑
+
+```
+left = 递归函数(root->left);  // 左
+right = 递归函数(root->right); // 右
+left与right的逻辑处理;         // 中
+如果left 和 right都不为空，说明此时root就是最近公共节点。这个比较好理解
+
+如果left为空，right不为空，就返回right，说明目标节点是通过right返回的，反之依然。
+
+```
+
+```python
+
+class Solution:
+    def lowestCommonAncestor(self, root, p, q):
+        if root == q or root == p or root is None:
+            return root
+
+        left = self.lowestCommonAncestor(root.left, p, q)
+        right = self.lowestCommonAncestor(root.right, p, q)
+
+        if left is not None and right is not None:
+            return root
+
+        if left is None and right is not None:
+            return right
+        elif left is not None and right is None:
+            return left
+        else: 
+            return None
+```
+
+![236.二叉树的最近公共祖先2](https://camo.githubusercontent.com/8aaf71724e838ca2fd761f10b83ec4bffe8bc48054868a012d3378fd1d34fccb/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f3230323130323034313531323538322e706e67)
+
