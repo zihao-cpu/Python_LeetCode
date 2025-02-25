@@ -1567,3 +1567,201 @@ class Solution:
 
         return root       
 ```
+# 删除二叉搜索树中的节点
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0450.%E5%88%A0%E9%99%A4%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91%E4%B8%AD%E7%9A%84%E8%8A%82%E7%82%B9.md
+
+递归三部曲：
+
+1.确定递归函数和参数
+
+```
+TreeNode* deleteNode(TreeNode* root, int key)
+```
+
+2.确定终止条件
+
+```
+if (root == nullptr) return root;
+```
+
+3.确定单层递归逻辑
+
+有以下五种情况：
+
+- 第一种情况：没找到删除的节点，遍历到空节点直接返回了
+- 找到删除的节点
+  - 第二种情况：左右孩子都为空（叶子节点），直接删除节点， 返回NULL为根节点
+  - 第三种情况：删除节点的左孩子为空，右孩子不为空，删除节点，右孩子补位，返回右孩子为根节点
+  - 第四种情况：删除节点的右孩子为空，左孩子不为空，删除节点，左孩子补位，返回左孩子为根节点
+  - 第五种情况：左右孩子节点都不为空，则将删除节点的左子树头结点（左孩子）放到删除节点的右子树的最左面节点的左孩子上，返回删除节点右孩子为新的根节点。
+
+![450.删除二叉搜索树中的节点](https://camo.githubusercontent.com/08973539011a17808beec01ad99749f6eb5c74ee46f4e5cdfd698ba93eed9456/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f676966732f3435302e2545352538382541302545392539392541342545342542412538432545352538462538392545362539302539432545372542342541322545362541302539312545342542382541442545372539412538342545382538412538322545372538322542392e676966)
+
+```python
+class Solution:
+    def deleteNode(self, root, key):
+        if root is None:
+            return root
+        if root.val == key:
+            if root.left is None and root.right is None:
+                return None
+            elif root.left is None:
+                return root.right
+            elif root.right is None:
+                return root.left
+            else:
+                cur = root.right
+                while cur.left is not None:
+                    cur = cur.left
+                cur.left = root.left
+                return root.right
+        if root.val > key:
+            root.left = self.deleteNode(root.left, key)
+        if root.val < key:
+            root.right = self.deleteNode(root.right, key)
+        return root
+```
+
+版本二
+
+```python
+class Solution:
+    def deleteNode(self, root, key):
+        if root is None:  # 如果根节点为空，直接返回
+            return root
+        if root.val == key:  # 找到要删除的节点
+            if root.right is None:  # 如果右子树为空，直接返回左子树作为新的根节点
+                return root.left
+            cur = root.right
+            while cur.left:  # 找到右子树中的最左节点
+                cur = cur.left
+            root.val, cur.val = cur.val, root.val  # 将要删除的节点值与最左节点值交换
+        root.left = self.deleteNode(root.left, key)  # 在左子树中递归删除目标节点
+        root.right = self.deleteNode(root.right, key)  # 在右子树中递归删除目标节点
+        return root
+```
+
+# 修剪二叉搜索树
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0669.%E4%BF%AE%E5%89%AA%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91.md
+
+递归三部曲:
+
+1.确定递归函数和参数：
+
+这里我们为什么需要返回值呢？
+
+因为是要遍历整棵树，做修改，其实不需要返回值也可以，我们也可以完成修剪（其实就是从二叉树中移除节点）的操作。
+
+但是有返回值，更方便，可以通过递归函数的返回值来移除节点。
+
+```
+TreeNode* trimBST(TreeNode* root, int low, int high)
+```
+
+2.确定单层递归逻辑：
+
+如果root（当前节点）的元素小于low的数值，那么应该递归右子树，并返回右子树符合条件的头结点。
+
+代码如下：
+
+```
+if (root->val < low) {
+    TreeNode* right = trimBST(root->right, low, high); // 寻找符合区间[low, high]的节点
+    return right;
+}
+```
+
+如果root(当前节点)的元素大于high的，那么应该递归左子树，并返回左子树符合条件的头结点。
+
+```
+if (root->val > high) {
+    TreeNode* left = trimBST(root->left, low, high); // 寻找符合区间[low, high]的节点
+    return left;
+}
+```
+
+接下来要将下一层处理完左子树的结果赋给root->left，处理完右子树的结果赋给root->right。最后返回root节点，代码如下：
+
+```
+root->left = trimBST(root->left, low, high); // root->left接入符合条件的左孩子
+root->right = trimBST(root->right, low, high); // root->right接入符合条件的右孩子
+return root;
+```
+
+![669.修剪二叉搜索树1](https://camo.githubusercontent.com/6e56cef023c285aaeab11fbce95b54bf334dbb1137a030cccf33c4c090006ecb/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303230343135353332373230332d32303233303331303132303132363733382e706e67)
+
+如下代码相当于把节点0的右孩子（节点2）返回给上一层，
+
+```
+if (root->val < low) {
+    TreeNode* right = trimBST(root->right, low, high); // 寻找符合区间[low, high]的节点
+    return right;
+}
+```
+
+然后如下代码相当于用节点3的左孩子 把下一层返回的 节点0的右孩子（节点2） 接住。
+
+```
+root->left = trimBST(root->left, low, high);
+```
+
+```python
+class Solution:
+    def trimBST(self, root: TreeNode, low: int, high: int) -> TreeNode:
+        if root is None:
+            return None
+        if root.val < low:
+            # 寻找符合区间 [low, high] 的节点
+            return self.trimBST(root.right, low, high)
+        if root.val > high:
+            # 寻找符合区间 [low, high] 的节点
+            return self.trimBST(root.left, low, high)
+        root.left = self.trimBST(root.left, low, high)  # root.left 接入符合条件的左孩子
+        root.right = self.trimBST(root.right, low, high)  # root.right 接入符合条件的右孩子
+        return root
+```
+
+迭代法：
+
+因为二叉搜索树的有序性，不需要使用栈模拟递归的过程。
+
+在剪枝的时候，可以分为三步：
+
+- 将root移动到[L, R] 范围内，注意是左闭右闭区间
+- 剪枝左子树
+- 剪枝右子树
+
+```python
+class Solution:
+    def trimBST(self, root: TreeNode, L: int, R: int) -> TreeNode:
+        if not root:
+            return None
+        
+        # 处理头结点，让root移动到[L, R] 范围内，注意是左闭右闭
+        while root and (root.val < L or root.val > R):
+            if root.val < L:
+                root = root.right  # 小于L往右走
+            else:
+                root = root.left  # 大于R往左走
+        
+        cur = root
+        
+        # 此时root已经在[L, R] 范围内，处理左孩子元素小于L的情况
+        while cur:
+            while cur.left and cur.left.val < L:
+                cur.left = cur.left.right
+            cur = cur.left
+        
+        cur = root
+        
+        # 此时root已经在[L, R] 范围内，处理右孩子大于R的情况
+        while cur:
+            while cur.right and cur.right.val > R:
+                cur.right = cur.right.left
+            cur = cur.right
+        
+        return root
+```
+
