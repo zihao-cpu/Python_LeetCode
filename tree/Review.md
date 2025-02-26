@@ -1764,4 +1764,133 @@ class Solution:
         
         return root
 ```
+# 将有序数组转换为二叉搜索树
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0108.%E5%B0%86%E6%9C%89%E5%BA%8F%E6%95%B0%E7%BB%84%E8%BD%AC%E6%8D%A2%E4%B8%BA%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91.md
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+```
+// 左闭右闭区间[left, right]
+TreeNode* traversal(vector<int>& nums, int left, int right)
+```
+
+2.确定终止条件：
+
+```
+if (left > right) return nullptr;
+```
+
+3.确定单层递归逻辑
+
+```
+int mid = left + ((right - left) / 2);
+TreeNode* root = new TreeNode(nums[mid]);
+root->left = traversal(nums, left, mid - 1);
+root->right = traversal(nums, mid + 1, right);
+return root;
+```
+
+```python
+class Solution:
+    def traversal(self, nums: List[int], left: int, right: int) -> TreeNode:
+        if left > right:
+            return None
+        
+        mid = left + (right - left) // 2
+        root = TreeNode(nums[mid])
+        root.left = self.traversal(nums, left, mid - 1)
+        root.right = self.traversal(nums, mid + 1, right)
+        return root
+    
+    def sortedArrayToBST(self, nums: List[int]) -> TreeNode:
+        root = self.traversal(nums, 0, len(nums) - 1)
+        return root
+```
+
+# 把二叉搜索树转换成累加树(反中序遍历)
+
+**其实这就是一棵树，大家可能看起来有点别扭，换一个角度来看，这就是一个有序数组[2, 5, 13]，求从后到前的累加数组，也就是[20, 18, 13]，是不是感觉这就简单了。**
+
+因为数组大家都知道怎么遍历啊，从后向前，挨个累加就完事了，这换成了二叉搜索树，看起来就别扭了一些是不是。
+
+那么知道如何遍历这个二叉树，也就迎刃而解了，**从树中可以看出累加的顺序是右中左，所以我们需要反中序遍历这个二叉树，然后顺序累加就可以了**。
+
+![538.把二叉搜索树转换为累加树](https://camo.githubusercontent.com/87981180b104dc1521e68fbc96f92c77732d9a9320ef2400dfb9fea7a29c8987/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303230343135333434303636362e706e67)
+
+本题依然需要一个pre指针记录当前遍历节点cur的前一个节点，这样才方便做累加。
+
+pre指针的使用技巧，我们在**二叉树：搜索树的最小绝对差**提到了，这是常用的操作手段。
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+```
+int pre = 0; // 记录前一个节点的数值
+void traversal(TreeNode* cur)
+```
+
+2.确定终止条件：
+
+```
+if (cur == NULL) return;
+```
+
+3.确定单层递归逻辑
+
+```
+traversal(cur->right);  // 右
+cur->val += pre;        // 中
+pre = cur->val;
+traversal(cur->left);   // 左
+```
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def convertBST(self, root: TreeNode) -> TreeNode:
+        self.pre = 0  # 记录前一个节点的数值
+        self.traversal(root)
+        return root
+    def traversal(self, cur):
+        if cur is None:
+            return        
+        self.traversal(cur.right)
+        cur.val += self.pre
+        self.pre = cur.val
+        self.traversal(cur.left)
+```
+
+迭代法：
+
+```python
+class Solution:
+    def __init__(self):
+        self.pre = 0  # 记录前一个节点的数值
+    
+    def traversal(self, root):
+        stack = []
+        cur = root
+        while cur or stack:
+            if cur:
+                stack.append(cur)
+                cur = cur.right  # 右
+            else:
+                cur = stack.pop()  # 中
+                cur.val += self.pre
+                self.pre = cur.val
+                cur = cur.left  # 左
+    
+    def convertBST(self, root):
+        self.pre = 0
+        self.traversal(root)
+        return root
+```
