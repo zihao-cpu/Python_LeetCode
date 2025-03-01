@@ -148,3 +148,193 @@ class Solution:
             path.pop()  # 回溯
 ```
 
+# 电话号码字符组合
+
+[leetcode-master/problems/0017.电话号码的字母组合.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0017.%E7%94%B5%E8%AF%9D%E5%8F%B7%E7%A0%81%E7%9A%84%E5%AD%97%E6%AF%8D%E7%BB%84%E5%90%88.md)
+
+数字和字母如何映射
+
+```
+const string letterMap[10] = {
+    "", // 0
+    "", // 1
+    "abc", // 2
+    "def", // 3
+    "ghi", // 4
+    "jkl", // 5
+    "mno", // 6
+    "pqrs", // 7
+    "tuv", // 8
+    "wxyz", // 9
+};
+```
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+首先需要一个字符串s来收集叶子节点的结果，然后用一个字符串数组result保存起来，这两个变量我依然定义为全局。
+
+再来看参数，参数指定是有题目中给的string digits，然后还要有一个参数就是int型的index。
+
+注意这个index可不是 [77.组合](https://programmercarl.com/0077.%E7%BB%84%E5%90%88.html)和[216.组合总和III](https://programmercarl.com/0216.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8CIII.html)中的startIndex了。
+
+这个index是记录遍历第几个数字了，就是用来遍历digits的（题目中给出数字字符串），同时index也表示树的深度。
+
+```
+vector<string> result;
+string s;
+void backtracking(const string& digits, int index)
+```
+
+2.确定终止条件：
+
+例如输入用例"23"，两个数字，那么根节点往下递归两层就可以了，叶子节点就是要收集的结果集。
+
+那么终止条件就是如果index 等于 输入的数字个数（digits.size）了（本来index就是用来遍历digits的）。
+
+然后收集结果，结束本层递归。
+
+```
+if (index == digits.size()) {
+    result.push_back(s);
+    return;
+}
+```
+
+3.确定单层递归逻辑：
+
+首先要取index指向的数字，并找到对应的字符集（手机键盘的字符集）。
+
+然后for循环来处理这个字符集，代码如下：
+
+```
+int digit = digits[index] - '0';        // 将index指向的数字转为int
+string letters = letterMap[digit];      // 取数字对应的字符集
+for (int i = 0; i < letters.size(); i++) {
+    s.push_back(letters[i]);            // 处理
+    backtracking(digits, index + 1);    // 递归，注意index+1，一下层要处理下一个数字了
+    s.pop_back();                       // 回溯
+}
+```
+
+
+
+![17. 电话号码的字母组合](https://camo.githubusercontent.com/ae8f089040e7c9fabedfaeddc935a028db0dd74672d8d1205b7da91ec52210d1/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313132333230303330343436392e706e67)
+
+```python
+class Solution:
+    def __init__(self):
+        self.letterMap = [
+            "",     # 0
+            "",     # 1
+            "abc",  # 2
+            "def",  # 3
+            "ghi",  # 4
+            "jkl",  # 5
+            "mno",  # 6
+            "pqrs", # 7
+            "tuv",  # 8
+            "wxyz"  # 9
+        ]
+        self.result = []
+        self.s = ""
+
+    def backtracking(self, digits, index):
+        if index == len(digits):
+            self.result.append(self.s)
+            return
+        digit = int(digits[index])    # 将索引处的数字转换为整数
+        letters = self.letterMap[digit]    # 获取对应的字符集
+        for i in range(len(letters)):
+            self.s += letters[i]    # 处理字符
+            self.backtracking(digits, index + 1)    # 递归调用，注意索引加1，处理下一个数字
+            self.s = self.s[:-1]    # 回溯，删除最后添加的字符
+
+    def letterCombinations(self, digits):
+        if len(digits) == 0:
+            return self.result
+        self.backtracking(digits, 0)
+        return self.result
+```
+# 组合总和
+
+[leetcode-master/problems/0039.组合总和.md at master · zihao-cpu/leetcode-master](https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0039.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8C.md)
+
+![39.组合总和](https://camo.githubusercontent.com/7c8b1de05154bec1e4bdbe6aa4d6e647905fc1a0d56489a4c32c25cd5f825b62/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313232333137303733303336372e706e67)
+
+递归三部曲：
+
+1.确定递归函数和参数
+
+这里依然是定义两个全局变量，二维数组result存放结果集，数组path存放符合条件的结果。（这两个变量可以作为函数参数传入）
+
+首先是题目中给出的参数，集合candidates, 和目标值target。
+
+此外我还定义了int型的sum变量来统计单一结果path里的总和，其实这个sum也可以不用，用target做相应的减法就可以了，最后如何target==0就说明找到符合的结果了，但为了代码逻辑清晰，我依然用了sum。**本题还需要startIndex来控制for循环的起始位置，对于组合问题，什么时候需要startIndex呢？**
+
+我举过例子，如果是一个集合来求组合的话，就需要startInde
+
+```
+vector<vector<int>> result;
+vector<int> path;
+void backtracking(vector<int>& candidates, int target, int sum, int startIndex)
+```
+
+2.递归终止条件：
+
+从叶子节点可以清晰看到，终止只有两种情况，sum大于target和sum等于target。
+
+sum等于target的时候，需要收集结果，代码如下：
+
+```
+if (sum > target) {
+    return;
+}
+if (sum == target) {
+    result.push_back(path);
+    return;
+}
+```
+
+3.单层递归逻辑：
+
+单层for循环依然是从startIndex开始，搜索candidates集合。
+
+**注意本题和77.组合、216.组合总和III的一个区别是：本题元素为可重复选取的**。
+
+如何重复选取呢，看代码，注释部分：
+
+```
+for (int i = startIndex; i < candidates.size(); i++) {
+    sum += candidates[i];
+    path.push_back(candidates[i]);
+    backtracking(candidates, target, sum, i); // 关键点:不用i+1了，表示可以重复读取当前的数
+    sum -= candidates[i];   // 回溯
+    path.pop_back();        // 回溯
+}
+```
+
+```python
+class Solution:
+
+    def backtracking(self, candidates, target, total, startIndex, path, result):
+        if total > target:
+            return
+        if total == target:
+            result.append(path[:])
+            return
+
+        for i in range(startIndex, len(candidates)):
+            total += candidates[i]
+            path.append(candidates[i])
+            self.backtracking(candidates, target, total, i, path, result)  # 不用i+1了，表示可以重复读取当前的数
+            total -= candidates[i]
+            path.pop()
+
+    def combinationSum(self, candidates, target):
+        result = []
+        self.backtracking(candidates, target, 0, 0, [], result)
+        return result
+```
+
