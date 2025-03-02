@@ -273,7 +273,7 @@ class Solution:
 
 此外我还定义了int型的sum变量来统计单一结果path里的总和，其实这个sum也可以不用，用target做相应的减法就可以了，最后如何target==0就说明找到符合的结果了，但为了代码逻辑清晰，我依然用了sum。**本题还需要startIndex来控制for循环的起始位置，对于组合问题，什么时候需要startIndex呢？**
 
-我举过例子，如果是一个集合来求组合的话，就需要startInde
+我举过例子，**如果是一个集合来求组合的话，就需要startIndex**
 
 ```
 vector<vector<int>> result;
@@ -336,5 +336,98 @@ class Solution:
         result = []
         self.backtracking(candidates, target, 0, 0, [], result)
         return result
+```
+
+# 分割回文串
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0131.%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2.md
+
+![131.分割回文串](https://camo.githubusercontent.com/eb7d2ca0bbcbe1950d45c6927f10b39d50f6e436591ca0ba1d5ddeea49e0f6c2/68747470733a2f2f636f64652d7468696e6b696e672e63646e2e626365626f732e636f6d2f706963732f3133312e2545352538382538362545352538392542322545352539422539452545362539362538372545342542382542322e6a7067)
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+全局变量数组path存放切割后回文的子串，二维数组result存放结果集。 （这两个参数可以放到函数参数里）
+
+本题递归函数参数还需要startIndex，因为切割过的地方，不能重复切割，和组合问题也是保持一致的。
+
+```
+vector<vector<string>> result;
+vector<string> path; // 放已经回文的子串
+void backtracking (const string& s, int startIndex) {
+```
+
+2.确定终止条件：
+
+在处理组合问题的时候，递归参数需要传入startIndex，表示下一轮递归遍历的起始位置，这个startIndex就是切割线。
+
+所以终止条件代码如下：
+
+```
+void backtracking (const string& s, int startIndex) {
+    // 如果起始位置已经大于s的大小，说明已经找到了一组分割方案了
+    if (startIndex >= s.size()) {
+        result.push_back(path);
+        return;
+    }
+}
+```
+
+3.单层递归逻辑：
+
+```
+for (int i = startIndex; i < s.size(); i++) {
+    if (isPalindrome(s, startIndex, i)) { // 是回文子串
+        // 获取[startIndex,i]在s中的子串
+        string str = s.substr(startIndex, i - startIndex + 1);
+        path.push_back(str);
+    } else {                // 如果不是则直接跳过
+        continue;
+    }
+    backtracking(s, i + 1); // 寻找i+1为起始位置的子串
+    path.pop_back();        // 回溯过程，弹出本次已经添加的子串
+}
+```
+
+```python
+class Solution:
+
+    def partition(self, s: str) -> List[List[str]]:
+        '''
+        递归用于纵向遍历
+        for循环用于横向遍历
+        当切割线迭代至字符串末尾，说明找到一种方法
+        类似组合问题，为了不重复切割同一位置，需要start_index来做标记下一轮递归的起始位置(切割线)
+        '''
+        result = []
+        self.backtracking(s, 0, [], result)
+        return result
+
+    def backtracking(self, s, start_index, path, result ):
+        # Base Case
+        if start_index == len(s):
+            result.append(path[:])
+            return
+        
+        # 单层递归逻辑
+        for i in range(start_index, len(s)):
+            # 此次比其他组合题目多了一步判断：
+            # 判断被截取的这一段子串([start_index, i])是否为回文串
+            if self.is_palindrome(s, start_index, i):
+                path.append(s[start_index:i+1])
+                self.backtracking(s, i+1, path, result)   # 递归纵向遍历：从下一处进行切割，判断其余是否仍为回文串
+                path.pop()             # 回溯
+
+
+    def is_palindrome(self, s: str, start: int, end: int) -> bool:
+        i: int = start        
+        j: int = end
+        while i < j:
+            if s[i] != s[j]:
+                return False
+            i += 1
+            j -= 1
+        return True 
 ```
 
