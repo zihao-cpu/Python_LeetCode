@@ -1,3 +1,20 @@
+# 回溯算法模板
+
+```
+void backtracking(参数) {
+    if (终止条件) {
+        存放结果;
+        return;
+    }
+
+    for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) {
+        处理节点;
+        backtracking(路径，选择列表); // 递归
+        回溯，撤销处理结果
+    }
+}
+```
+
 # 组合
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0077.%E7%BB%84%E5%90%88.md
@@ -431,3 +448,190 @@ class Solution:
         return True 
 ```
 
+# 复原IP地址
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0093.%E5%A4%8D%E5%8E%9FIP%E5%9C%B0%E5%9D%80.md
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+在[131.分割回文串](https://programmercarl.com/0131.%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2.html)中我们就提到切割问题类似组合问题。
+
+startIndex一定是需要的，因为不能重复分割，记录下一层递归分割的起始位置。
+
+本题我们还需要一个变量pointNum，记录添加逗点的数量。
+
+所以代码如下：
+
+```
+vector<string> result;// 记录结果
+// startIndex: 搜索的起始位置，pointNum:添加逗点的数量
+void backtracking(string& s, int startIndex, int pointNum) {
+```
+
+2.确定终止条件：
+
+终止条件和[131.分割回文串](https://programmercarl.com/0131.%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2.html)情况就不同了，本题明确要求只会分成4段，所以不能用切割线切到最后作为终止条件，而是分割的段数作为终止条件。
+
+pointNum表示逗点数量，pointNum为3说明字符串分成了4段了。
+
+然后验证一下第四段是否合法，如果合法就加入到结果集里
+
+代码如下：
+
+```
+if (pointNum == 3) { // 逗点数量为3时，分隔结束
+    // 判断第四段子字符串是否合法，如果合法就放进result中
+    if (isValid(s, startIndex, s.size() - 1)) {
+        result.push_back(s);
+    }
+    return;
+}
+```
+
+3.确定单层递归逻辑：
+
+在[131.分割回文串](https://programmercarl.com/0131.%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2.html)中已经讲过在循环遍历中如何截取子串。
+
+在`for (int i = startIndex; i < s.size(); i++)`循环中 [startIndex, i] 这个区间就是截取的子串，需要判断这个子串是否合法。
+
+如果合法就在字符串后面加上符号`.`表示已经分割。
+
+如果不合法就结束本层循环，如图中剪掉的分支
+
+![93.复原IP地址](https://camo.githubusercontent.com/7e8d3b4814c59bfb7f5e13bb177f83aca30ef0cfd000e29405a7e8cf1b5d6679/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313132333230333733353933332d32303233303331303133323331343130392e706e67)
+
+然后就是递归和回溯的过程：
+
+递归调用时，下一层递归的startIndex要从i+2开始（因为需要在字符串中加入了分隔符`.`），同时记录分割符的数量pointNum 要 +1。
+
+回溯的时候，就将刚刚加入的分隔符`.` 删掉就可以了，pointNum也要-1。
+
+代码如下：
+
+```
+for (int i = startIndex; i < s.size(); i++) {
+    if (isValid(s, startIndex, i)) { // 判断 [startIndex,i] 这个区间的子串是否合法
+        s.insert(s.begin() + i + 1 , '.');  // 在i的后面插入一个逗点
+        pointNum++;
+        backtracking(s, i + 2, pointNum);   // 插入逗点之后下一个子串的起始位置为i+2
+        pointNum--;                         // 回溯
+        s.erase(s.begin() + i + 1);         // 回溯删掉逗点
+    } else break; // 不合法，直接结束本层循环
+}
+```
+
+
+
+```python
+class Solution:
+    def __init__(self):
+        self.result = []  # 用于存储结果
+
+    def restoreIpAddresses(self, s: str):
+        if len(s) > 12:  # 算是剪枝了
+            return self.result  # 如果字符串长度大于12，直接返回空结果
+        self.backTrack(s, 0, 0)  # 初始化回溯
+        return self.result
+
+    # start_index: 搜索的起始位置， point_num: 添加逗点的数量
+    def backTrack(self, s, start_index, point_num):
+        if point_num == 3:  # 逗点数量为3时，分隔结束
+            if self.isValid(s, start_index, len(s) - 1):  # 判断第四段子字符串是否合法
+                self.result.append(s)  # 如果合法，将结果添加到list中
+            return
+
+        for i in range(start_index, len(s)):
+            if self.isValid(s, start_index, i):  # 判断 [start_index, i] 这个区间的子串是否合法
+                s = s[:i + 1] + "." + s[i + 1:]  # 在s[i+1]后面插入一个逗点
+                point_num += 1
+                self.backTrack(s, i + 2, point_num)  # 插入逗点后，下一个子串的起始位置为i+2
+                point_num -= 1  # 回溯
+                s = s[:i + 1] + s[i + 2:]  # 回溯删除逗点
+            else:
+                break  # 不合法，直接结束本层循环
+
+    # 判断字符串s在[start, end]所组成的数字是否合法
+    def isValid(self, s, start, end):
+        if start > end:
+            return False
+        if s[start] == '0' and start != end:  # 0开头的数字不合法
+            return False
+        num = 0
+        for i in range(start, end + 1):
+            if s[i] > '9' or s[i] < '0':  # 遇到非数字字符不合法
+                return False
+            num = num * 10 + int(s[i])  # 计算数字
+            if num > 255:  # 如果数字大于255，不合法
+                return False
+        return True
+```
+
+
+
+# 子集
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0078.%E5%AD%90%E9%9B%86.md
+
+求子集问题和[77.组合](https://programmercarl.com/0077.%E7%BB%84%E5%90%88.html)和[131.分割回文串](https://programmercarl.com/0131.%E5%88%86%E5%89%B2%E5%9B%9E%E6%96%87%E4%B8%B2.html)又不一样了。
+
+如果把 子集问题、组合问题、分割问题都抽象为一棵树的话，**那么组合问题和分割问题都是收集树的叶子节点，而子集问题是找树的所有节点！**
+
+其实子集也是一种组合问题，因为它的集合是无序的，子集{1,2} 和 子集{2,1}是一样的。
+
+**那么既然是无序，取过的元素不会重复取，写回溯算法的时候，for就要从startIndex开始，而不是从0开始！**
+
+有同学问了，什么时候for可以从0开始呢？
+
+求排列问题的时候，就要从0开始，因为集合是有序的，{1, 2} 和{2, 1}是两个集合，排列问题我们后续的文章就会讲到的。
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+全局变量数组path为子集收集元素，二维数组result存放子集组合。（也可以放到递归函数参数里）
+
+递归函数参数在上面讲到了，需要startIndex。
+
+```
+vector<vector<int>> result;
+vector<int> path;
+void backtracking(vector<int>& nums, int startIndex) {
+```
+
+2.确定终止函数
+
+```
+if (startIndex >= nums.size()) {
+    return;
+}
+```
+
+3.确定单层递归逻辑：
+
+```
+for (int i = startIndex; i < nums.size(); i++) {
+    path.push_back(nums[i]);    // 子集收集元素
+    backtracking(nums, i + 1);  // 注意从i+1开始，元素不重复取
+    path.pop_back();            // 回溯
+}
+```
+
+```python
+class Solution:
+    def subsets(self, nums):
+        result = []
+        path = []
+        self.backtracking(nums, 0, path, result)
+        return result
+
+    def backtracking(self, nums, startIndex, path, result):
+        result.append(path[:])  # 收集子集，要放在终止添加的上面，否则会漏掉自己
+         if startIndex >= len(nums):  # 终止条件可以不加
+             return
+        for i in range(startIndex, len(nums)):
+            path.append(nums[i])
+            self.backtracking(nums, i + 1, path, result)
+            path.pop()
+```
