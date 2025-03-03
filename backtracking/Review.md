@@ -15,7 +15,7 @@ void backtracking(参数) {
 }
 ```
 
-# 组合
+# 组合1
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0077.%E7%BB%84%E5%90%88.md
 
@@ -87,7 +87,7 @@ class Solution:
 
 ```
 
-# 组合$\mathrm{iii}$
+# 组合3
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0216.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8CIII.md
 
@@ -354,6 +354,159 @@ class Solution:
         self.backtracking(candidates, target, 0, 0, [], result)
         return result
 ```
+
+# 组合总和2
+
+递归三部曲：
+
+1.确定递归函数和参数:
+
+```
+vector<vector<int>> result; // 存放组合集合
+vector<int> path;           // 符合条件的组合
+void backtracking(vector<int>& candidates, int target, int sum, int startIndex, vector<bool>& used) {
+```
+
+2.确定终止条件：
+
+```
+if (sum > target) { // 这个条件其实可以省略
+    return;
+}
+if (sum == target) {
+    result.push_back(path);
+    return;
+}
+```
+
+3.确定单层递归逻辑：
+
+前面我们提到：要去重的是“同一树层上的使用过”，如何判断同一树层上元素（相同的元素）是否使用过了呢。
+
+**如果candidates[i] == candidates[i - 1] 并且 used[i - 1] == false，就说明：前一个树枝，使用了candidates[i - 1]，也就是说同一树层使用过candidates[i - 1]**。
+
+此时for循环里就应该做continue的操作。
+
+![40.组合总和II1](https://camo.githubusercontent.com/ed15c1a2231344d68975dbe8adace2e04788d8e1dec1e48bffd91207969d81a9/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303233303331303030303935342e706e67)
+
+我在图中将used的变化用橘黄色标注上，可以看出在candidates[i] == candidates[i - 1]相同的情况下：
+
+- used[i - 1] == true，说明同一树枝candidates[i - 1]使用过
+- used[i - 1] == false，说明同一树层candidates[i - 1]使用过
+
+![img](https://camo.githubusercontent.com/0f8088f3c695785f6e4084aca29ff788cd31632e610901be43b6a9f7ee723b93/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303232313032313136333831322e706e67)
+
+```
+for (int i = startIndex; i < candidates.size() && sum + candidates[i] <= target; i++) {
+    // used[i - 1] == true，说明同一树枝candidates[i - 1]使用过
+    // used[i - 1] == false，说明同一树层candidates[i - 1]使用过
+    // 要对同一树层使用过的元素进行跳过
+    if (i > 0 && candidates[i] == candidates[i - 1] && used[i - 1] == false) {
+        continue;
+    }
+    sum += candidates[i];
+    path.push_back(candidates[i]);
+    used[i] = true;
+    backtracking(candidates, target, sum, i + 1, used); // 和39.组合总和的区别1：这里是i+1，每个数字在每个组合中只能使用一次
+    used[i] = false;
+    sum -= candidates[i];
+    path.pop_back();
+}
+```
+
+class Solution:
+
+
+```python
+def backtracking(self, candidates, target, total, startIndex, used, path, result):
+    if total == target:
+        result.append(path[:])
+        return
+
+    for i in range(startIndex, len(candidates)):
+        # 对于相同的数字，只选择第一个未被使用的数字，跳过其他相同数字
+        if i > startIndex and candidates[i] == candidates[i - 1] and not used[i - 1]:
+            continue
+
+        if total + candidates[i] > target:
+            break
+
+        total += candidates[i]
+        path.append(candidates[i])
+        used[i] = True
+        self.backtracking(candidates, target, total, i + 1, used, path, result)
+        used[i] = False
+        total -= candidates[i]
+        path.pop()
+
+def combinationSum2(self, candidates, target):
+    used = [False] * len(candidates)
+    result = []
+    candidates.sort()
+    self.backtracking(candidates, target, 0, 0, used, [], result)
+    return result
+```
+class Solution:
+
+
+```python
+def backtracking(self, candidates, target, total, startIndex, path, result):
+    if total == target:
+        result.append(path[:])
+        return
+
+    for i in range(startIndex, len(candidates)):
+        if i > startIndex and candidates[i] == candidates[i - 1]:
+            continue
+
+        if total + candidates[i] > target:
+            break
+
+        total += candidates[i]
+        path.append(candidates[i])
+        self.backtracking(candidates, target, total, i + 1, path, result)
+        total -= candidates[i]
+        path.pop()
+
+def combinationSum2(self, candidates, target):
+    result = []
+    candidates.sort()
+    self.backtracking(candidates, target, 0, 0, [], result)
+    return result
+```
+
+
+```python
+class Solution:
+
+
+    def backtracking(self, candidates, target, total, startIndex, path, result):
+        if total == target:
+            result.append(path[:])
+            return
+
+        for i in range(startIndex, len(candidates)):
+            if i > startIndex and candidates[i] == candidates[i - 1]:
+                continue
+
+            if total + candidates[i] > target:
+                break
+
+            total += candidates[i]
+            path.append(candidates[i])
+            self.backtracking(candidates, target, total, i + 1, path, result)
+            total -= candidates[i]
+            path.pop()
+
+    def combinationSum2(self, candidates, target):
+        result = []
+        candidates.sort()
+        self.backtracking(candidates, target, 0, 0, [], result)
+        return result
+
+```
+
+
 
 # 分割回文串
 
@@ -635,3 +788,34 @@ class Solution:
             self.backtracking(nums, i + 1, path, result)
             path.pop()
 ```
+# 子集2
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0090.%E5%AD%90%E9%9B%86II.md
+
+![90.子集II](https://camo.githubusercontent.com/6c5581f950c575b696075adb09ff83b20da855bfe8885d56340a46c003f52d14/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313132343139353431313937372e706e67)
+
+```python
+class Solution:
+    def subsetsWithDup(self, nums):
+        result = []
+        path = []
+        used = [False] * len(nums)
+        nums.sort()  # 去重需要排序
+        self.backtracking(nums, 0, used, path, result)
+        return result
+
+    def backtracking(self, nums, startIndex, used, path, result):
+        result.append(path[:])  # 收集子集
+        for i in range(startIndex, len(nums)):
+            # used[i - 1] == True，说明同一树枝 nums[i - 1] 使用过
+            # used[i - 1] == False，说明同一树层 nums[i - 1] 使用过
+            # 而我们要对同一树层使用过的元素进行跳过
+            if i > 0 and nums[i] == nums[i - 1] and not used[i - 1]:
+                continue
+            path.append(nums[i])
+            used[i] = True
+            self.backtracking(nums, i + 1, used, path, result)
+            used[i] = False
+            path.pop()
+```
+
