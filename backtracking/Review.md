@@ -819,3 +819,85 @@ class Solution:
             path.pop()
 ```
 
+用set来去重
+
+```python
+class Solution:
+    def subsetsWithDup(self, nums):
+        result = []
+        path = []
+        nums.sort()  # 去重需要排序
+        self.backtracking(nums, 0, path, result)
+        return result
+
+    def backtracking(self, nums, startIndex, path, result):
+        result.append(path[:])  # 收集子集
+        uset = set()
+        for i in range(startIndex, len(nums)):
+            if nums[i] in uset:
+                continue
+            uset.add(nums[i])
+            path.append(nums[i])
+            self.backtracking(nums, i + 1, path, result)
+            path.pop()
+```
+
+
+
+# 递增子序列
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0491.%E9%80%92%E5%A2%9E%E5%AD%90%E5%BA%8F%E5%88%97.md
+
+![img](https://camo.githubusercontent.com/b6f87952d3994dd67f64866a26c5ed7d73c932ea5d7b9d36d9cdaec085dfdf10/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313132343230303232393832342e706e67)
+
+在[90.子集II](https://programmercarl.com/0090.%E5%AD%90%E9%9B%86II.html)中我们是通过排序，再加一个标记数组来达到去重的目的。
+
+而本题求自增子序列，是不能对原数组进行排序的，排完序的数组都是自增子序列了
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+```
+vector<vector<int>> result;
+vector<int> path;
+void backtracking(vector<int>& nums, int startIndex)
+```
+
+2.确定终止条件：
+
+```
+if (path.size() > 1) {
+    result.push_back(path);
+    // 注意这里不要加return，因为要取树上的所有节点
+}
+```
+
+3.单层递归逻辑：
+
+![491. 递增子序列1](https://camo.githubusercontent.com/af5364c9333b307f1b6af25b3a1c2c810bf500420f001cd9c625d9b6c635038d/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313132343230303232393832342d32303233303331303133313634303037302e706e67)
+
+```python
+class Solution:
+    def findSubsequences(self, nums):
+        result = []
+        path = []
+        self.backtracking(nums, 0, path, result)
+        return result
+    
+    def backtracking(self, nums, startIndex, path, result):
+        if len(path) > 1:
+            result.append(path[:])  # 注意要使用切片将当前路径的副本加入结果集
+            # 注意这里不要加return，要取树上的节点
+        
+        uset = set()  # 使用集合对本层元素进行去重
+        for i in range(startIndex, len(nums)):
+            if (path and nums[i] < path[-1]) or nums[i] in uset:
+                continue
+            
+            uset.add(nums[i])  # 记录这个元素在本层用过了，本层后面不能再用了
+            path.append(nums[i])
+            self.backtracking(nums, i + 1, path, result)
+            path.pop()
+```
+
