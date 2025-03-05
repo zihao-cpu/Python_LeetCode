@@ -901,3 +901,67 @@ class Solution:
             path.pop()
 ```
 
+# 全排列
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0046.%E5%85%A8%E6%8E%92%E5%88%97.md
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+**首先排列是有序的，也就是说 [1,2] 和 [2,1] 是两个集合，这和之前分析的子集以及组合所不同的地方**。
+
+可以看出元素1在[1,2]中已经使用过了，但是在[2,1]中还要在使用一次1，所以处理排列问题就不用使用startIndex了。
+
+但排列问题需要一个used数组，标记已经选择的元素，如图橘黄色部分所示:
+
+![img](https://camo.githubusercontent.com/7e6b2ad9dfa8e2918ca2c78b4b01e2714f13bb2c6bfef2a4b7c39b21aa87d2fc/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303234303830333138303331382e706e67)
+
+2.确定终止条件：
+
+```
+// 此时说明找到了一组
+if (path.size() == nums.size()) {
+    result.push_back(path);
+    return;
+}
+```
+
+3.确定单层逻辑：
+
+因为排列问题，每次都要从头开始搜索，例如元素1在[1,2]中已经使用过了，但是在[2,1]中还要再使用一次1。
+
+**而used数组，其实就是记录此时path里都有哪些元素使用了，一个排列里一个元素只能使用一次**。
+
+```
+for (int i = 0; i < nums.size(); i++) {
+    if (used[i] == true) continue; // path里已经收录的元素，直接跳过
+    used[i] = true;
+    path.push_back(nums[i]);
+    backtracking(nums, used);
+    path.pop_back();
+    used[i] = false;
+}
+```
+
+```python
+class Solution:
+    def permute(self, nums):
+        result = []
+        self.backtracking(nums, [], [False] * len(nums), result)
+        return result
+
+    def backtracking(self, nums, path, used, result):
+        if len(path) == len(nums):
+            result.append(path[:])
+            return
+        for i in range(len(nums)):
+            if used[i]:
+                continue
+            used[i] = True
+            path.append(nums[i])
+            self.backtracking(nums, path, used, result)
+            path.pop()
+            used[i] = False
+```
+
