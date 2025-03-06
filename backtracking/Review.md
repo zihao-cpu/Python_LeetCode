@@ -1006,3 +1006,48 @@ class Solution:
             used[i] = False
 ```
 
+# 重新安排行程
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0332.%E9%87%8D%E6%96%B0%E5%AE%89%E6%8E%92%E8%A1%8C%E7%A8%8B.md
+
+一个机场映射多个机场，机场之间要靠字母序排列，一个机场映射多个机场 **可以用字典完成映射关系**
+
+**再说一下为什么一定要增删元素呢，正如开篇我给出的图中所示，出发机场和到达机场是会重复的，搜索的过程没及时删除目的机场就会死循环。**
+
+![332.重新安排行程1](https://camo.githubusercontent.com/165c8e39d4b22328267e492853b9fcfc54996e99548b4fa4ef0a87f727150df5/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f323032303131313531383036353535352d32303233303331303132313232333630302e706e67)
+
+```python
+class Solution:
+    def findItinerary(self, tickets: List[List[str]]) -> List[str]:
+        self.adj = {}
+
+        # sort by the destination alphabetically
+        # 根据航班每一站的重点字母顺序排序
+        tickets.sort(key=lambda x:x[1])
+
+        # get all possible connection for each destination
+        # 罗列每一站的下一个可选项
+        for u,v in tickets:
+            if u in self.adj: self.adj[u].append(v)
+            else: self.adj[u] = [v]
+
+        # 从JFK出发
+        self.result = []
+        self.dfs("JFK")  # start with JFK
+
+        return self.result[::-1]  # reverse to get the result
+
+    def dfs(self, s):
+        # if depart city has flight and the flight can go to another city
+        while s in self.adj and len(self.adj[s]) > 0:
+            # 找到s能到哪里，选能到的第一个机场
+            v = self.adj[s][0]  # we go to the 1 choice of the city
+            # 在之后的可选项机场中去掉这个机场
+            self.adj[s].pop(0)  # get rid of this choice since we used it
+            # 从当前的新出发点开始
+            self.dfs(v)  # we start from the new airport
+
+        self.result.append(s)  # after append, it will back track to last node, thus the result list is in reversed order
+
+```
+
