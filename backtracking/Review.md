@@ -965,3 +965,44 @@ class Solution:
             used[i] = False
 ```
 
+# 全排列2
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0047.%E5%85%A8%E6%8E%92%E5%88%97II.md
+
+这道题目和[46.全排列](https://programmercarl.com/0046.%E5%85%A8%E6%8E%92%E5%88%97.html)的区别在与**给定一个可包含重复数字的序列**，要返回**所有不重复的全排列**。
+
+这里又涉及到去重了。
+
+在[40.组合总和II](https://programmercarl.com/0040.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8CII.html) 、[90.子集II](https://programmercarl.com/0090.%E5%AD%90%E9%9B%86II.html)我们分别详细讲解了组合问题和子集问题如何去重。
+
+那么排列问题其实也是一样的套路。
+
+**还要强调的是去重一定要对元素进行排序，这样我们才方便通过相邻的节点来判断是否重复使用了**。
+
+![47.全排列II1](https://camo.githubusercontent.com/a7cf72f0351ebafaf5a469de967ea63b0a5ae4c7c47578feff7c9730f442c232/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313132343230313333313232332e706e67)
+
+```python
+class Solution:
+    def permuteUnique(self, nums):
+        nums.sort()  # 排序
+        result = []
+        self.backtracking(nums, [], [False] * len(nums), result)
+        return result
+
+    def backtracking(self, nums, path, used, result):
+        if len(path) == len(nums):
+            result.append(path[:])
+            return
+          
+            #used[i - 1] == true，说明同⼀树⽀nums[i - 1]使⽤过
+            #sed[i - 1] == false，说明同⼀树层nums[i - 1]使⽤过
+        for i in range(len(nums)):
+            if (i > 0 and nums[i] == nums[i - 1] and not used[i - 1]) or used[i]:
+                continue
+            used[i] = True
+            path.append(nums[i])
+            self.backtracking(nums, path, used, result)
+            path.pop()
+            used[i] = False
+```
+
