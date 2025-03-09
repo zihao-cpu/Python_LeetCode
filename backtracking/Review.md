@@ -1051,3 +1051,218 @@ class Solution:
 
 ```
 
+# N 皇后
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0051.N%E7%9A%87%E5%90%8E.md
+
+![51.N皇后](https://camo.githubusercontent.com/403aaa499a02fe18ca82635dde8c1a5c2bdd1792918d4d6c0e5839b2b7c47b6f/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303133303138323533323330332e6a7067)
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+我依然是定义全局变量二维数组result来记录最终结果。
+
+参数n是棋盘的大小，然后用row来记录当前遍历到棋盘的第几层了。
+
+```
+vector<vector<string>> result;
+void backtracking(int n, int row, vector<string>& chessboard) {
+```
+
+2.确定终止条件：
+
+```
+if (row == n) {
+    result.push_back(chessboard);
+    return;
+}
+```
+
+3.确定单层递归逻辑
+
+递归深度就是row控制棋盘的行，每一层里for循环的col控制棋盘的列，一行一列，确定了放置皇后的位置。
+
+每次都是要从新的一行的起始位置开始搜，所以都是从0开始。
+
+代码如下：
+
+```
+for (int col = 0; col < n; col++) {
+    if (isValid(row, col, chessboard, n)) { // 验证合法就可以放
+        chessboard[row][col] = 'Q'; // 放置皇后
+        backtracking(n, row + 1, chessboard);
+        chessboard[row][col] = '.'; // 回溯，撤销皇后
+    }
+}
+
+bool isValid(int row, int col, vector<string>& chessboard, int n) {
+    // 检查列
+    for (int i = 0; i < row; i++) { // 这是一个剪枝
+        if (chessboard[i][col] == 'Q') {
+            return false;
+        }
+    }
+    // 检查 45度角是否有皇后
+    for (int i = row - 1, j = col - 1; i >=0 && j >= 0; i--, j--) {
+        if (chessboard[i][j] == 'Q') {
+            return false;
+        }
+    }
+    // 检查 135度角是否有皇后
+    for(int i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
+        if (chessboard[i][j] == 'Q') {
+            return false;
+        }
+    }
+    return true;
+}
+```
+
+```python
+class Solution:
+    def solveNQueens(self, n: int) -> List[List[str]]:
+        result = []  # 存储最终结果的二维字符串数组
+
+        chessboard = ['.' * n for _ in range(n)]  # 初始化棋盘
+        self.backtracking(n, 0, chessboard, result)  # 回溯求解
+        return [[''.join(row) for row in solution] for solution in result]  # 返回结果集
+
+    def backtracking(self, n: int, row: int, chessboard: List[str], result: List[List[str]]) -> None:
+        if row == n:
+            result.append(chessboard[:])  # 棋盘填满，将当前解加入结果集
+            return
+
+        for col in range(n):
+            if self.isValid(row, col, chessboard):
+                chessboard[row] = chessboard[row][:col] + 'Q' + chessboard[row][col+1:]  # 放置皇后
+                self.backtracking(n, row + 1, chessboard, result)  # 递归到下一行
+                chessboard[row] = chessboard[row][:col] + '.' + chessboard[row][col+1:]  # 回溯，撤销当前位置的皇后
+
+    def isValid(self, row: int, col: int, chessboard: List[str]) -> bool:
+        # 检查列
+        for i in range(row):
+            if chessboard[i][col] == 'Q':
+                return False  # 当前列已经存在皇后，不合法
+
+        # 检查 45 度角是否有皇后
+        i, j = row - 1, col - 1
+        while i >= 0 and j >= 0:
+            if chessboard[i][j] == 'Q':
+                return False  # 左上方向已经存在皇后，不合法
+            i -= 1
+            j -= 1
+
+        # 检查 135 度角是否有皇后
+        i, j = row - 1, col + 1
+        while i >= 0 and j < len(chessboard):
+            if chessboard[i][j] == 'Q':
+                return False  # 右上方向已经存在皇后，不合法
+            i -= 1
+            j += 1
+
+        return True  # 当前位置合法
+```
+
+# 数独问题
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0037.%E8%A7%A3%E6%95%B0%E7%8B%AC.md
+
+![37.解数独](https://camo.githubusercontent.com/3c5c49f4fe196a2611f8b83b452b29cad045ceacd68f831138eafd7633bfb735/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f323032303131313732303435313739302d32303233303331303133313832323235342e706e67)
+
+递归三部曲：
+
+1.确定递归函数和参数：
+
+```
+bool backtracking(vector<vector<char>>& board)
+```
+
+2.确定递归终止条件:
+
+3.确定单层递归逻辑：
+
+```
+bool backtracking(vector<vector<char>>& board) {
+    for (int i = 0; i < board.size(); i++) {        // 遍历行
+        for (int j = 0; j < board[0].size(); j++) { // 遍历列
+            if (board[i][j] != '.') continue;
+            for (char k = '1'; k <= '9'; k++) {     // (i, j) 这个位置放k是否合适
+                if (isValid(i, j, k, board)) {
+                    board[i][j] = k;                // 放置k
+                    if (backtracking(board)) return true; // 如果找到合适一组立刻返回
+                    board[i][j] = '.';              // 回溯，撤销k
+                }
+            }
+            return false;                           // 9个数都试完了，都不行，那么就返回false
+        }
+    }
+    return true; // 遍历完没有返回false，说明找到了合适棋盘位置了
+}
+
+bool isValid(int row, int col, char val, vector<vector<char>>& board) {
+    for (int i = 0; i < 9; i++) { // 判断行里是否重复
+        if (board[row][i] == val) {
+            return false;
+        }
+    }
+    for (int j = 0; j < 9; j++) { // 判断列里是否重复
+        if (board[j][col] == val) {
+            return false;
+        }
+    }
+    int startRow = (row / 3) * 3;
+    int startCol = (col / 3) * 3;
+    for (int i = startRow; i < startRow + 3; i++) { // 判断9方格里是否重复
+        for (int j = startCol; j < startCol + 3; j++) {
+            if (board[i][j] == val ) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+```
+
+```python
+class Solution:
+    def solveSudoku(self, board: List[List[str]]) -> None:
+        """
+        Do not return anything, modify board in-place instead.
+        """
+        self.backtracking(board)
+
+    def backtracking(self, board: List[List[str]]) -> bool:
+        # 若有解，返回True；若无解，返回False
+        for i in range(len(board)): # 遍历行
+            for j in range(len(board[0])):  # 遍历列
+                # 若空格内已有数字，跳过
+                if board[i][j] != '.': continue
+                for k in range(1, 10):
+                    if self.is_valid(i, j, k, board):
+                        board[i][j] = str(k)
+                        if self.backtracking(board): return True
+                        board[i][j] = '.'
+                # 若数字1-9都不能成功填入空格，返回False无解
+                return False
+        return True # 有解
+
+    def is_valid(self, row: int, col: int, val: int, board: List[List[str]]) -> bool:
+        # 判断同一行是否冲突
+        for i in range(9):
+            if board[row][i] == str(val):
+                return False
+        # 判断同一列是否冲突
+        for j in range(9):
+            if board[j][col] == str(val):
+                return False
+        # 判断同一九宫格是否有冲突
+        start_row = (row // 3) * 3
+        start_col = (col // 3) * 3
+        for i in range(start_row, start_row + 3):
+            for j in range(start_col, start_col + 3):
+                if board[i][j] == str(val):
+                    return False
+        return True
+```
+
