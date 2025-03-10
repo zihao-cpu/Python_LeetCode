@@ -185,3 +185,40 @@ class Solution:
         
         return ans
 ```
+
+# K次取反后最大化
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/1005.K%E6%AC%A1%E5%8F%96%E5%8F%8D%E5%90%8E%E6%9C%80%E5%A4%A7%E5%8C%96%E7%9A%84%E6%95%B0%E7%BB%84%E5%92%8C.md
+
+让绝对值大的负数变为正数，当前数值达到最大，整体最优：整个数组和达到最大。
+
+那么如果将负数都转变为正数了，K依然大于0，此时的问题是一个有序正整数序列，如何转变K次正负，让 数组和 达到最大。
+
+那么又是一个贪心：局部最优：只找数值最小的正整数进行反转，当前数值和可以达到最大
+
+- 第一步：将数组按照绝对值大小从大到小排序，**注意要按照绝对值的大小**
+- 第二步：从前向后遍历，遇到负数将其变为正数，同时K--
+- 第三步：如果K还大于0，那么反复转变数值最小的元素，将K用完
+- 第四步：求和
+
+```python
+class Solution:
+    def largestSumAfterKNegations(self, A: List[int], K: int) -> int:
+        A.sort(key=lambda x: abs(x), reverse=True)  # 第一步：按照绝对值降序排序数组A
+
+        for i in range(len(A)):  # 第二步：执行K次取反操作
+            if A[i] < 0 and K > 0:
+                A[i] *= -1
+                K -= 1
+
+        if K % 2 == 1:  # 第三步：如果K还有剩余次数，将绝对值最小的元素取反
+            A[-1] *= -1
+
+        result = sum(A)  # 第四步：计算数组A的元素和
+        return result
+```
+
+
+
+
+
