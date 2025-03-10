@@ -79,3 +79,109 @@ class Solution:
         return result
 ```
 
+# 买卖股票2
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0122.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAII.md
+
+![122.买卖股票的最佳时机II](https://camo.githubusercontent.com/afca931d44f9a0a879bc1fc29d9dc4255e0df106f151a5bb7b007bb195861824/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f323032303131323931373438303835382d32303233303331303133343635393437372e706e67)
+
+从图中可以发现，其实我们需要收集每天的正利润就可以，**收集正利润的区间，就是股票买卖的区间，而我们只需要关注最终利润，不需要记录区间**。
+
+那么只收集正利润就是贪心所贪的地方！
+
+**局部最优：收集每天的正利润，全局最优：求得最大利润**。
+
+局部最优可以推出全局最优，找不出反例，试一试贪心！
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        result = 0
+        for i in range(1, len(prices)):
+            result += max(prices[i] - prices[i - 1], 0)
+        return result
+```
+
+
+
+# 跳跃游戏
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0055.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8F.md
+
+![img](https://camo.githubusercontent.com/20d86ba18186ae1352192c7898b01e33519a374d94c5e1b5b97a19aeffd3c448/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303233303230333130353633342e706e67)
+
+其实跳几步无所谓，关键在于可跳的覆盖范围！
+
+不一定非要明确一次究竟跳几步，每次取最大的跳跃步数，这个就是可以跳跃的覆盖范围。
+
+这个范围内，别管是怎么跳的，反正一定可以跳过来。
+
+**那么这个问题就转化为跳跃覆盖范围究竟可不可以覆盖到终点！**
+
+每次移动取最大跳跃步数（得到最大的覆盖范围），每移动一个单位，就更新最大覆盖范围。
+
+```python
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        cover = 0
+        if len(nums) == 1: return True
+        i = 0
+        # python不支持动态修改for循环中变量,使用while循环代替
+        while i <= cover:
+            cover = max(i + nums[i], cover)
+            if cover >= len(nums) - 1: return True
+            i += 1
+        return False
+      
+      
+ ## for循环
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        cover = 0
+        if len(nums) == 1: return True
+        for i in range(len(nums)):
+            if i <= cover:
+                cover = max(i + nums[i], cover)
+                if cover >= len(nums) - 1: return True
+        return False
+```
+
+# 跳跃游戏2
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0045.%E8%B7%B3%E8%B7%83%E6%B8%B8%E6%88%8FII.md
+
+![45.跳跃游戏II](https://camo.githubusercontent.com/2edd43825df9eb9106f2727e9295e7a558734e2c2f6139ef40cf66d493d1844d/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313230313233323330393130332e706e67)
+
+本题要计算最少步数，那么就要想清楚什么时候步数才一定要加一呢？
+
+贪心的思路，局部最优：**当前可移动距离尽可能多走，如果还没到终点，步数再加一**。整体最优：一步尽可能多走，从而达到最少步数。
+
+**所以真正解题的时候，要从覆盖范围出发，不管怎么跳，覆盖范围内一定是可以跳到的，以最小的步数增加覆盖范围，覆盖范围一旦覆盖了终点，得到的就是最少步数！**
+
+
+
+```
+ cur_distance = 0  # 当前覆盖最远距离下标
+ next_distance = 0  # 下一步覆盖最远距离下标
+```
+
+```python
+class Solution:
+    def jump(self, nums):
+        if len(nums) == 1:
+            return 0
+        
+        cur_distance = 0  # 当前覆盖最远距离下标
+        ans = 0  # 记录走的最大步数
+        next_distance = 0  # 下一步覆盖最远距离下标
+        
+        for i in range(len(nums)):
+            next_distance = max(nums[i] + i, next_distance)  # 更新下一步覆盖最远距离下标
+            if i == cur_distance:  # 遇到当前覆盖最远距离下标
+                ans += 1  # 需要走下一步
+                cur_distance = next_distance  # 更新当前覆盖最远距离下标（相当于加油了）
+                if next_distance >= len(nums) - 1:  # 当前覆盖最远距离达到数组末尾，不用再做ans++操作，直接结束
+                    break
+        
+        return ans
+```
