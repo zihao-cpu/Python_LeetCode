@@ -218,7 +218,33 @@ class Solution:
         return result
 ```
 
+# 加油站
 
+首先如果总油量减去总消耗大于等于零那么一定可以跑完一圈，说明 各个站点的加油站 剩油量rest[i]相加一定是大于等于零的。
 
+每个加油站的剩余量rest[i]为gas[i] - cost[i]。
 
+i从0开始累加rest[i]，和记为curSum，一旦curSum小于零，说明[0, i]区间都不能作为起始位置，因为这个区间选择任何一个位置作为起点，到i这里都会断油，那么起始位置从i+1算起，再从0计算curSum。
+
+![img](https://camo.githubusercontent.com/30005d9f049f5a7512d5bdc094cfbfbcf07b58497944e24e93ffd3f1bd3177b6/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303233303131373136353632382e706e67)
+
+```python
+class Solution:
+    def canCompleteCircuit(self, gas: List[int], cost: List[int]) -> int:
+        curSum = 0  # 当前累计的剩余油量
+        totalSum = 0  # 总剩余油量
+        start = 0  # 起始位置
+        
+        for i in range(len(gas)):
+            curSum += gas[i] - cost[i]
+            totalSum += gas[i] - cost[i]
+            
+            if curSum < 0:  # 当前累计剩余油量curSum小于0
+                start = i + 1  # 起始位置更新为i+1
+                curSum = 0  # curSum重新从0开始累计
+        
+        if totalSum < 0:
+            return -1  # 总剩余油量totalSum小于0，说明无法环绕一圈
+        return start
+```
 
