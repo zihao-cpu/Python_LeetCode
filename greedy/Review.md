@@ -248,3 +248,85 @@ class Solution:
         return start
 ```
 
+# 分发糖果
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0135.%E5%88%86%E5%8F%91%E7%B3%96%E6%9E%9C.md
+
+这道题目一定是要确定一边之后，再确定另一边，例如比较每一个孩子的左边，然后再比较右边，**如果两边一起考虑一定会顾此失彼**。
+
+
+
+```python
+class Solution:
+    def candy(self, ratings: List[int]) -> int:
+        candyVec = [1] * len(ratings)
+        
+        # 从前向后遍历，处理右侧比左侧评分高的情况
+        #起点下标1 从左往右，只要 右边 比 左边 大，右边的糖果=左边 + 1
+        for i in range(1, len(ratings)):
+            if ratings[i] > ratings[i - 1]:
+                candyVec[i] = candyVec[i - 1] + 1
+        
+        # 从后向前遍历，处理左侧比右侧评分高的情况
+        #此时 左边的糖果应该 取本身的糖果数（符合比它左边大,上一步确认了） 和 右边糖果数 + 1 二者的最大值，这样才符合 它比它左边的大，也比它右边大
+        for i in range(len(ratings) - 2, -1, -1):
+            if ratings[i] > ratings[i + 1]:
+                candyVec[i] = max(candyVec[i], candyVec[i + 1] + 1)
+        
+        # 统计结果
+        result = sum(candyVec)
+        return result
+```
+
+# 柠檬水找零
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0860.%E6%9F%A0%E6%AA%AC%E6%B0%B4%E6%89%BE%E9%9B%B6.md
+
+分三种情况：1.遇到5，直接five++;2.遇到10，先判断five是不是小于等于0，是则直接false，否则five--,ten++;3.遇到20，先判断five>0 && ten>0,是的话 先优先消耗10美元，因为5美元的找零用处更大，能多留着就多留着，不是 也别急，再看看five是不是大于等于3，是的话five-=3,twenty++,否则false
+
+```python
+class Solution:
+    def lemonadeChange(self, bills: List[int]) -> bool:
+        five = 0
+        ten = 0
+        twenty = 0
+        
+        for bill in bills:
+            # 情况一：收到5美元
+            if bill == 5:
+                five += 1
+            
+            # 情况二：收到10美元
+            if bill == 10:
+                if five <= 0:
+                    return False
+                ten += 1
+                five -= 1
+            
+            # 情况三：收到20美元
+            if bill == 20:
+                # 先尝试使用10美元和5美元找零
+                if five > 0 and ten > 0:
+                    five -= 1
+                    ten -= 1
+                    #twenty += 1
+                # 如果无法使用10美元找零，则尝试使用三张5美元找零
+                elif five >= 3:
+                    five -= 3
+                    #twenty += 1
+                else:
+                    return False
+        
+        return True
+```
+
+
+
+
+
+
+
+
+
+
+
