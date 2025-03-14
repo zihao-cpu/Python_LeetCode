@@ -320,11 +320,30 @@ class Solution:
         return True
 ```
 
+# 根据身高重建队列
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0406.%E6%A0%B9%E6%8D%AE%E8%BA%AB%E9%AB%98%E9%87%8D%E5%BB%BA%E9%98%9F%E5%88%97.md
+
+先确定其中一个维度
+
+![406.根据身高重建队列](https://camo.githubusercontent.com/f52ba0c868b5c042afac703972554d0079fc77b0e0db396e9ba91d84c94222fe/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313231363230313835313938322e706e67)
 
 
 
-
-
+```python
+class Solution:
+    def reconstructQueue(self, people: List[List[int]]) -> List[List[int]]:
+    	# 先按照h维度的身高顺序从高到低排序。确定第一个维度
+        # lambda返回的是一个元组：当-x[0](维度h）相同时，再根据x[1]（维度k）从小到大排序
+        people.sort(key=lambda x: (-x[0], x[1]))
+        que = []
+	
+	# 根据每个元素的第二个维度k，贪心算法，进行插入
+        # people已经排序过了：同一高度时k值小的排前面。
+        for p in people:
+            que.insert(p[1], p)
+        return que
+```
 
 
 
