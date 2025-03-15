@@ -347,5 +347,45 @@ class Solution:
 
 
 
+# 用最少数量的气球引爆气球
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0452.%E7%94%A8%E6%9C%80%E5%B0%91%E6%95%B0%E9%87%8F%E7%9A%84%E7%AE%AD%E5%BC%95%E7%88%86%E6%B0%94%E7%90%83.md
+
+**为了让气球尽可能的重叠，需要对数组进行排序**。
+
+![452.用最少数量的箭引爆气球](https://camo.githubusercontent.com/db5670da054e24383aa949527909f4775b4c3079631fc2a10568e23b32d629cb/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313132333130313932393739312e706e67)
+
+```python
+class Solution:
+    def findMinArrowShots(self, points: List[List[int]]) -> int:
+        if len(points) == 0: return 0
+        points.sort(key=lambda x: x[0])
+        result = 1
+        for i in range(1, len(points)):
+            if points[i][0] > points[i - 1][1]: # 气球i和气球i-1不挨着，注意这里不是>=
+                result += 1     
+            else:
+                points[i][1] = min(points[i - 1][1], points[i][1]) # 更新重叠气球最小右边界
+        return result
+```
+
+
+
+```python
+class Solution: # 不改变原数组
+    def findMinArrowShots(self, points: List[List[int]]) -> int:
+        points.sort(key = lambda x: x[0])
+        sl,sr = points[0][0],points[0][1]
+        count = 1
+        for i in points:
+            if i[0]>sr:
+                count+=1
+                sl,sr = i[0],i[1]
+            else:
+                sl = max(sl,i[0])
+                sr = min(sr,i[1])
+        return count
+```
+
 
 
