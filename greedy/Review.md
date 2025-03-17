@@ -406,3 +406,30 @@ class Solution:
                 points[i][1] = min(points[i - 1][1], points[i][1]) # 更新重叠气球最小右边界
         return len(pints)-result
 ```
+# 划分字母区间
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0763.%E5%88%92%E5%88%86%E5%AD%97%E6%AF%8D%E5%8C%BA%E9%97%B4.md
+
+![763.划分字母区间](https://camo.githubusercontent.com/34523118ad851996eae267b1fabf97270a043bdb95d2f07e624b8e6eea3f471a/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313232323139313932343431372e706e67)
+
+
+
+```python
+class Solution:
+    def partitionLabels(self, s: str) -> List[int]:
+        last_occurrence = {}  # 存储每个字符最后出现的位置
+        for i, ch in enumerate(s):
+            last_occurrence[ch] = i
+
+        result = []
+        start = 0
+        end = 0
+        for i, ch in enumerate(s):
+            end = max(end, last_occurrence[ch])  # 找到当前字符出现的最远位置
+            if i == end:  # 如果当前位置是最远位置，表示可以分割出一个区间
+                result.append(end - start + 1)
+                start = i + 1
+
+        return result
+```
+
