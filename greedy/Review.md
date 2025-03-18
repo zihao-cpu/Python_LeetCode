@@ -433,3 +433,29 @@ class Solution:
         return result
 ```
 
+# 合并重叠区间
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0056.%E5%90%88%E5%B9%B6%E5%8C%BA%E9%97%B4.md
+
+![56.合并区间](https://camo.githubusercontent.com/d4ac14d4e6ff6d8a8ee406c143c23d1a1bf1f57ecfba28d7f63e442edc6e52a1/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303230313232333230303633323739312e706e67)
+
+```python
+class Solution:
+    def merge(self, intervals):
+        result = []
+        if len(intervals) == 0:
+            return result  # 区间集合为空直接返回
+
+        intervals.sort(key=lambda x: x[0])  # 按照区间的左边界进行排序
+
+        result.append(intervals[0])  # 第一个区间可以直接放入结果集中
+
+        for i in range(1, len(intervals)):
+            if result[-1][1] >= intervals[i][0]:  # 发现重叠区间
+                # 合并区间，只需要更新结果集最后一个区间的右边界，因为根据排序，左边界已经是最小的
+                result[-1][1] = max(result[-1][1], intervals[i][1])
+            else:
+                result.append(intervals[i])  # 区间不重叠
+
+        return result
+```
