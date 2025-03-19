@@ -459,3 +459,66 @@ class Solution:
 
         return result
 ```
+
+
+
+
+# 单调递增的数字
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0738.%E5%8D%95%E8%B0%83%E9%80%92%E5%A2%9E%E7%9A%84%E6%95%B0%E5%AD%97.md
+
+举个例子，数字：332，从前向后遍历的话，那么就把变成了329，此时2又小于了第一位的3了，真正的结果应该是299。
+
+那么从后向前遍历，就可以重复利用上次比较得出的结果了，从后向前遍历332的数值变化为：332 -> 329 -> 299
+
+确定了遍历顺序之后，那么此时局部最优就可以推出全局，找不出反例，试试贪心。
+
+**一旦出现strNum[i - 1] > strNum[i]的情况（非单调递增），首先想让strNum[i - 1]--，然后strNum[i]给为9**
+
+```python
+class Solution:
+    def monotoneIncreasingDigits(self, N: int) -> int:
+        # 将整数转换为字符串
+        strNum = str(N)
+        # flag用来标记赋值9从哪里开始
+        # 设置为字符串长度，为了防止第二个for循环在flag没有被赋值的情况下执行
+        flag = len(strNum)
+        
+        # 从右往左遍历字符串
+        for i in range(len(strNum) - 1, 0, -1):
+            # 如果当前字符比前一个字符小，说明需要修改前一个字符
+            if strNum[i - 1] > strNum[i]:
+                flag = i  # 更新flag的值，记录需要修改的位置
+                # 将前一个字符减1，以保证递增性质
+                strNum = strNum[:i - 1] + str(int(strNum[i - 1]) - 1) + strNum[i:]
+        
+        # 将flag位置及之后的字符都修改为9，以保证最大的递增数字
+        for i in range(flag, len(strNum)):
+            strNum = strNum[:i] + '9' + strNum[i + 1:]
+        
+        # 将最终的字符串转换回整数并返回
+        return int(strNum)
+      
+      
+class Solution:
+    def monotoneIncreasingDigits(self, N: int) -> int:
+        # 将整数转换为字符串
+        strNum = list(str(N))
+
+        # 从右往左遍历字符串
+        for i in range(len(strNum) - 1, 0, -1):
+            # 如果当前字符比前一个字符小，说明需要修改前一个字符
+            if strNum[i - 1] > strNum[i]:
+                strNum[i - 1] = str(int(strNum[i - 1]) - 1)  # 将前一个字符减1
+                # 将修改位置后面的字符都设置为9，因为修改前一个字符可能破坏了递增性质
+                for j in range(i, len(strNum)):
+                    strNum[j] = '9'
+
+        # 将列表转换为字符串，并将字符串转换为整数并返回
+        return int(''.join(strNum))
+```
+
+
+
+
+
