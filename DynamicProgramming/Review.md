@@ -1,3 +1,31 @@
+**4.确定遍历顺序：从递归公式dp[i] = dp[i - 1] + dp[i - 2];中可以看出，dp[i]是依赖 dp[i - 1] 和 dp[i - 2]，那么遍历的顺序一定是从前到后遍历的**
+
+**5.举例推导dp数组**
+
+```python
+class Solution:
+    def fib(self, n: int) -> int:
+       
+        # 排除 Corner Case
+        if n == 0:
+            return 0
+        
+        # 创建 dp table 
+        dp = [0] * (n + 1)
+
+        # 初始化 dp 数组
+        dp[0] = 0
+        dp[1] = 1
+
+        # 遍历顺序: 由前向后。因为后面要用到前面的状态
+        for i in range(2, n + 1):
+
+            # 确定递归公式/状态转移公式
+            dp[i] = dp[i - 1] + dp[i - 2]
+        
+        # 返回答案
+```
+
 # 01背包问题
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/%E8%83%8C%E5%8C%85%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%8001%E8%83%8C%E5%8C%85-1.md
@@ -65,6 +93,80 @@ for i in range(1, n):#遍历物品
 
 print(dp[n - 1][bagweight])
 ```
+
+# 爬楼梯
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0070.%E7%88%AC%E6%A5%BC%E6%A2%AF.md
+
+1. 确定dp数组以及下标的含义：dp[i]： 爬到第i层楼梯，有dp[i]种方法
+2. 首先是dp[i - 1]，上i-1层楼梯，有dp[i - 1]种方法，那么再一步跳一个台阶不就是dp[i]了么。还有就是dp[i - 2]，上i-2层楼梯，有dp[i - 2]种方法，那么再一步跳两个台阶不就是dp[i]了么。那么dp[i]就是 dp[i - 1]与dp[i - 2]之和！所以dp[i] = dp[i - 1] + dp[i - 2] 。在推导dp[i]的时候，一定要时刻想着dp[i]的定义，否则容易跑偏。这体现出确定dp数组以及下标的含义的重要性！
+3. 再回顾一下dp[i]的定义：爬到第i层楼梯，有dp[i]种方法。
+4. 从递推公式dp[i] = dp[i - 1] + dp[i - 2];中可以看出，遍历顺序一定是从前向后遍历的
+5. 举例推导dp数组
+
+```python
+# 空间复杂度为O(n)版本
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        if n <= 1:
+            return n
+        
+        dp = [0] * (n + 1)
+        dp[1] = 1
+        dp[2] = 2
+        
+        for i in range(3, n + 1):
+            dp[i] = dp[i - 1] + dp[i - 2]
+        
+        return dp[n]
+      
+      
+# 空间复杂度为O(3)版本
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        if n <= 1:
+            return n
+        
+        dp = [0] * 3
+        dp[1] = 1
+        dp[2] = 2
+        
+        for i in range(3, n + 1):
+            total = dp[1] + dp[2]
+            dp[1] = dp[2]
+            dp[2] = total
+        
+        return dp[2]
+      
+# 空间复杂度为O(1)版本
+class Solution:
+    def climbStairs(self, n: int) -> int:
+        if n <= 1:
+            return n
+        
+        prev1 = 1
+        prev2 = 2
+        
+        for i in range(3, n + 1):
+            total = prev1 + prev2
+            prev1 = prev2
+            prev2 = total
+        
+        return prev2
+      
+#递归版本 
+class Solution:	
+   def climbStairs(n):
+      # 基础条件
+      if n == 0:
+          return 1
+      elif n == 1:
+          return 1
+      # 递归
+      return climbStairs(n-1) + climbStairs(n-2)
+```
+
+
 
 
 
