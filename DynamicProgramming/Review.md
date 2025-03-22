@@ -166,7 +166,46 @@ class Solution:
       return climbStairs(n-1) + climbStairs(n-2)
 ```
 
+# 使用最小代价爬楼梯
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0746.%E4%BD%BF%E7%94%A8%E6%9C%80%E5%B0%8F%E8%8A%B1%E8%B4%B9%E7%88%AC%E6%A5%BC%E6%A2%AF.md
 
+1.确定dp数组以及下标的含义:
 
+使用动态规划，就要有一个数组来记录状态，本题只需要一个一维数组dp[i]就可以了。
+
+**dp[i]的定义：到达第i台阶所花费的最少体力为dp[i]**。
+
+2.确定递推公式：
+
+**可以有两个途径得到dp[i]，一个是dp[i-1] 一个是dp[i-2]**。
+
+dp[i - 1] 跳到 dp[i] 需要花费 dp[i - 1] + cost[i - 1]。
+
+dp[i - 2] 跳到 dp[i] 需要花费 dp[i - 2] + cost[i - 2]。
+
+那么究竟是选从dp[i - 1]跳还是从dp[i - 2]跳呢？
+
+**一定是选最小的，所以dp[i] = min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2]);**
+
+3.dp数组的初始化：
+
+4.确定遍历顺序：
+
+因为是模拟台阶，而且dp[i]由dp[i-1]dp[i-2]推出，所以是从前到后遍历cost数组就可以了。
+
+```python
+class Solution:
+    def minCostClimbingStairs(self, cost: List[int]) -> int:
+        dp = [0] * (len(cost) + 1)
+        dp[0] = 0  # 初始值，表示从起点开始不需要花费体力
+        dp[1] = 0  # 初始值，表示经过第一步不需要花费体力
+        
+        for i in range(2, len(cost) + 1):
+            # 在第i步，可以选择从前一步（i-1）花费体力到达当前步，或者从前两步（i-2）花费体力到达当前步
+            # 选择其中花费体力较小的路径，加上当前步的花费，更新dp数组
+            dp[i] = min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2])
+        
+        return dp[len(cost)]  # 返回到达楼顶的最小花费
+```
 
