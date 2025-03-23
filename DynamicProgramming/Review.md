@@ -209,3 +209,67 @@ class Solution:
         return dp[len(cost)]  # 返回到达楼顶的最小花费
 ```
 
+# 不同路径
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0062.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84.md
+
+![img](https://camo.githubusercontent.com/63c57cb05ca42b118e5007f26a5dea9d0a381571cf7498087f8844aed5ab4f70/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303131303137343033333231352e706e67)
+
+1.确定dp数组以及下标的含义:
+
+$$dp[i][j]$$ ：表示从（0 ，0）出发，到(i, j) 有$$dp[i][j]$$条不同的路径。
+
+2.确定递推公式：
+
+想要求dp[i][j]，只能有两个方向来推导出来，即$$dp[i - 1][j] 和 dp[i][j - 1]$$。
+
+此时在回顾一下$$ dp[i - 1][j] 表示啥，是从(0, 0)的位置到(i - 1, j)有几条路径，dp[i][j - 1]同理$$。
+
+那么很自然，$$dp[i][j] = dp[i - 1][j] + dp[i][j - 1]$$，因为dp[i][j]只有这两个方向过来。
+
+3.初始化：
+
+如何初始化呢，首先dp[i][0]一定都是1，因为从(0, 0)的位置到(i, 0)的路径只有一条，那么dp[0][j]也同理。
+
+```
+for (int i = 0; i < m; i++) dp[i][0] = 1;
+for (int j = 0; j < n; j++) dp[0][j] = 1;
+```
+
+4.确认遍历顺序：
+
+这里要看一下递推公式$$dp[i][j] = dp[i - 1][j] + dp[i][j - 1]，dp[i][j]$$都是从其上方和左方推导而来，那么从左到右一层一层遍历就可以了。
+
+这样就可以保证推导$$dp[i][j]​$$的时候，$$dp[i - 1][j] 和 dp[i][j - 1]​$$一定是有数值的。
+
+```python
+#递归的版本
+class Solution:
+    def uniquePaths(self, m: int, n: int) -> int:
+        if m == 1 or n == 1:
+            return 1
+        return self.uniquePaths(m - 1, n) + self.uniquePaths(m, n - 1)
+#dp      
+ class Solution:
+    def uniquePaths(self, m: int, n: int) -> int:
+        # 创建一个二维列表用于存储唯一路径数
+        dp = [[0] * n for _ in range(m)]
+        
+        # 设置第一行和第一列的基本情况
+        for i in range(m):
+            dp[i][0] = 1
+        for j in range(n):
+            dp[0][j] = 1
+        
+        # 计算每个单元格的唯一路径数
+        for i in range(1, m):
+            for j in range(1, n):
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+        
+        # 返回右下角单元格的唯一路径数
+        return dp[m - 1][n - 1]     
+      
+```
+
+
+
