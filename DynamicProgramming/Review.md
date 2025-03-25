@@ -240,7 +240,7 @@ for (int j = 0; j < n; j++) dp[0][j] = 1;
 
 这里要看一下递推公式$$dp[i][j] = dp[i - 1][j] + dp[i][j - 1]，dp[i][j]$$都是从其上方和左方推导而来，那么从左到右一层一层遍历就可以了。
 
-这样就可以保证推导$$dp[i][j]​$$的时候，$$dp[i - 1][j] 和 dp[i][j - 1]​$$一定是有数值的。
+这样就可以保证推导$$dp[i][j]$$的时候，$$dp[i - 1][j] 和 dp[i][j - 1]$$一定是有数值的。
 
 ```python
 #递归的版本
@@ -269,6 +269,60 @@ class Solution:
         # 返回右下角单元格的唯一路径数
         return dp[m - 1][n - 1]     
       
+```
+
+# 不同路径2
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0063.%E4%B8%8D%E5%90%8C%E8%B7%AF%E5%BE%84II.md
+
+1.确定dp数组以及下标的含义：
+
+$$dp[i][j] ：表示从（0 ，0）出发，到(i, j) 有dp[i][j]条不同的路径。$$
+
+2.确定递推公式：
+
+注意这里是没有障碍物的时候才去记录的
+
+```
+if (obstacleGrid[i][j] == 0) { // 当(i, j)没有障碍的时候，再推导dp[i][j]
+    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+}
+```
+
+3.dp数组初始化：
+
+![63.不同路径II](https://camo.githubusercontent.com/5a545948c1bcdd8c971ff487afad0c12864fda4f5c7a5ff9edbe2fdec6fb4b32/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303130343131343531333932382e706e67)
+
+注意如果有个地方有障碍物 则 后面的都不能通过
+
+4.确定遍历顺序
+
+
+
+```python
+class Solution:
+    def uniquePathsWithObstacles(self, obstacleGrid):
+        m = len(obstacleGrid)
+        n = len(obstacleGrid[0])
+        if obstacleGrid[m - 1][n - 1] == 1 or obstacleGrid[0][0] == 1:
+            return 0
+        dp = [[0] * n for _ in range(m)]
+        for i in range(m):
+            if obstacleGrid[i][0] == 0:  # 遇到障碍物时，直接退出循环，后面默认都是0
+                dp[i][0] = 1
+            else:
+                break
+        for j in range(n):
+            if obstacleGrid[0][j] == 0:
+                dp[0][j] = 1
+            else:
+                break
+        for i in range(1, m):
+            for j in range(1, n):
+                if obstacleGrid[i][j] == 1:
+                    continue
+                dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+        return dp[m - 1][n - 1]
 ```
 
 
