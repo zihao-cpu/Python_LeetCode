@@ -383,3 +383,51 @@ class Solution:
         return dp[n]  # 返回最终的计算结果
 ```
 
+# 01背包问题（滚动数组）
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/%E8%83%8C%E5%8C%85%E7%90%86%E8%AE%BA%E5%9F%BA%E7%A1%8001%E8%83%8C%E5%8C%85-2.md
+
+![img](https://camo.githubusercontent.com/e166e3b0e14b1304254d0426106aca0e4a143b4ee10bc08c60c43addc45ebd5d/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303234303733303131343232382e706e67)
+
+**其实可以发现如果把dp[i - 1]那一层拷贝到dp[i]上，表达式完全可以是：$$dp[i][j] = max(dp[i][j], dp[i][j - weight[i]] + value[i]);$$**
+
+**与其把dp[i - 1]这一层拷贝到dp[i]上，不如只用一个一维数组了**，只用dp[j]
+
+递推公式为：dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+
+遍历顺序：第一层遍历物品；第二层倒序遍历背包（为了保证每个物品放入一次）。
+
+**如果正序遍历**
+
+**dp[1] = dp[1 - weight[0]] + value[0] = 15**
+
+**dp[2] = dp[2 - weight[0]] + value[0] = 30**
+
+**此时dp[2]就已经是30了，意味着物品0，被放入了两次，所以不能正序遍历。**
+
+**为什么倒序遍历，就可以保证物品只放入一次呢？**
+
+**倒序就是先算dp[2]**
+
+**dp[2] = dp[2 - weight[0]] + value[0] = 15 （dp数组已经都初始化为0）**
+
+**dp[1] = dp[1 - weight[0]] + value[0] = 15**
+
+```python
+n, bagweight = map(int, input().split())
+weight = list(map(int, input().split()))
+value = list(map(int, input().split()))
+
+dp = [0] * (bagweight + 1)  # 创建一个动态规划数组dp，初始值为0
+
+dp[0] = 0  # 初始化dp[0] = 0,背包容量为0，价值最大为0
+
+for i in range(n):  # 应该先遍历物品，如果遍历背包容量放在上一层，那么每个dp[j]就只会放入一个物品
+    for j in range(bagweight, weight[i]-1, -1):  # 倒序遍历背包容量是为了保证物品i只被放入一次
+        dp[j] = max(dp[j], dp[j - weight[i]] + value[i])
+
+print(dp[bagweight])
+```
+
+
+
