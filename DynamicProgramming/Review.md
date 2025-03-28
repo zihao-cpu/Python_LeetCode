@@ -429,5 +429,68 @@ for i in range(n):  # 应该先遍历物品，如果遍历背包容量放在上�
 print(dp[bagweight])
 ```
 
+# 分割等和子集
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0416.%E5%88%86%E5%89%B2%E7%AD%89%E5%92%8C%E5%AD%90%E9%9B%86.md
+
+其实就是01背包问题
+
+ **套到本题，dp[j]表示 背包总容量（所能装的总重量）是j，放进物品后，背的最大重量为dp[j]**。
+
+```python
+class Solution:
+    def canPartition(self, nums: List[int]) -> bool:
+        _sum = 0
+
+        # dp[i]中的i表示背包内总和
+        # 题目中说：每个数组中的元素不会超过 100，数组的大小不会超过 200
+        # 总和不会大于20000，背包最大只需要其中一半，所以10001大小就可以了
+        dp = [0] * 10001
+        for num in nums:
+            _sum += num
+        # 也可以使用内置函数一步求和
+        # _sum = sum(nums)
+        if _sum % 2 == 1:
+            return False
+        target = _sum // 2
+
+        # 开始 0-1背包
+        for num in nums:
+            for j in range(target, num - 1, -1):  # 每一个元素一定是不可重复放入，所以从大到小遍历
+                dp[j] = max(dp[j], dp[j - num] + num)
+
+        # 集合中的元素正好可以凑成总和target
+        if dp[target] == target:
+            return True
+        return False
+     
+```
+
+```python
+class Solution:
+    def canPartition(self, nums: List[int]) -> bool:
+        
+        total_sum = sum(nums)
+
+        if total_sum % 2 != 0:
+            return False
+
+        target_sum = total_sum // 2
+        dp = [[False] * (target_sum + 1) for _ in range(len(nums) + 1)]
+
+        # 初始化第一行（空子集可以得到和为0）
+        for i in range(len(nums) + 1):
+            dp[i][0] = True
+
+        for i in range(1, len(nums) + 1):
+            for j in range(1, target_sum + 1):
+                if j < nums[i - 1]:
+                    # 当前数字大于目标和时，无法使用该数字
+                    dp[i][j] = dp[i - 1][j]
+                else:
+                    # 当前数字小于等于目标和时，可以选择使用或不使用该数字
+                    dp[i][j] = dp[i - 1][j] or dp[i - 1][j - nums[i - 1]]
+
+        return dp[len(nums)][target_sum]
+```
 
