@@ -92,6 +92,35 @@ for i in range(1, n):#遍历物品
             dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i])
 
 print(dp[n - 1][bagweight])
+
+
+
+
+
+
+
+def knapsack(i, W, weight, value):
+    # 递归的基本终止条件
+    if i == 0 or W == 0:
+        return 0
+    
+    # 如果当前物品的重量大于背包的容量，不能选择该物品
+    if weight[i - 1] > W:
+        return knapsack(i - 1, W, weight, value)
+    else:
+        # 比较选择当前物品和不选择当前物品的最大价值
+        return max(knapsack(i - 1, W, weight, value),
+                   value[i - 1] + knapsack(i - 1, W - weight[i - 1], weight, value))
+
+# 示例：物品的重量和价值
+weights = [2, 3, 4, 5]
+values = [3, 4, 5, 6]
+capacity = 5  # 背包容量
+
+# 计算最大价值
+n = len(weights)
+max_value = knapsack(n, capacity, weights, values)
+print(f"最大价值: {max_value}")
 ```
 
 # 爬楼梯
@@ -550,7 +579,91 @@ class Solution:
         return 0
 ```
 
+# 目标和
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0494.%E7%9B%AE%E6%A0%87%E5%92%8C.md
+
+**既然为target，那么就一定有 left组合 - right组合 = target。**
+
+**left + right = sum，而sum是固定的。right = sum - left**
+
+**left - (sum - left) = target 推导出 left = (target + sum)/2 。**
+
+**target是固定的，sum是固定的，left就可以求出来。**
+
+**此时问题就是在集合nums中找出和为left的组合。**
+
+
+
+**这次和之前遇到的背包问题不一样了，之前都是求容量为j的背包，最多能装多少。**
+
+**本题则是装满有几种方法。其实这就是一个组合问题了。**
+
+**1.只考虑物品0：**
+
+
+
+![img](https://camo.githubusercontent.com/e18f43bfc14625ddd12d59fb7eb069bd4d8e5bb9882120f0f0a7a214bc896faa/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303234303830383136313734372e706e67)
+
+**2.考虑物品0和物品1：**
+
+![img](https://camo.githubusercontent.com/9039c929049fb4f64a97ccb9a38f5ad65a2ea7cbb5034aea2d78b6df8ad5250b/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303234303830383136323035322e706e67)
+
+装满背包容量为0 的方法个数是1，即 放0件物品。
+
+装满背包容量为1 的方法个数是2，即 放物品0 或者 放物品1。
+
+装满背包容量为2 的方法个数是1，即 放物品0 和 放物品1。
+
+其他容量都不能装满，所以方法是0。
+
+**3.考虑物品0,1,2：**
+
+![img](https://camo.githubusercontent.com/df358e582a9ac9cafe226ca772857b04b095c65439ca6a71dca530e037a36b65/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303234303830383136323533332e706e67)
+
+装满背包容量为0 的方法个数是1，即 放0件物品。
+
+装满背包容量为1 的方法个数是3，即 放物品0 或者 放物品1 或者 放物品2。
+
+装满背包容量为2 的方法个数是3，即 放物品0 和 放物品1、放物品0 和 物品2、放物品1 和 物品2。
+
+装满背包容量为3的方法个数是1，即 放物品0 和 物品1 和 物品2。
+
+- **不放物品i**：即背包容量为j，里面不放物品i，装满有$$dp[i - 1][j]$$中方法。
+
+- **不放物品i**：即：先空出物品i的容量，背包容量为（j - 物品i容量），放满背包有 dp[i - 1][j - 物品i容量] 种方法。
+
+  ![img](https://camo.githubusercontent.com/d236c73885b6f30f83913f7c34c8355bf39c20dbc8436d05abbe41643914363c/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303234303832363131353830302e706e67)
+
+  ​
+
+  ```python
+  class Solution:
+      def findTargetSumWays(self, nums: List[int], target: int) -> int:
+          total_sum = sum(nums)  # 计算nums的总和
+          if abs(target) > total_sum:
+              return 0  # 此时没有方案
+          if (target + total_sum) % 2 == 1:
+              return 0  # 此时没有方案
+          target_sum = (target + total_sum) // 2  # 目标和
+
+          # 创建二维动态规划数组，行表示选取的元素数量，列表示累加和
+          dp = [[0] * (target_sum + 1) for _ in range(len(nums) + 1)]
+
+          # 初始化状态
+          dp[0][0] = 1
+
+          # 动态规划过程
+          for i in range(1, len(nums) + 1):
+              for j in range(target_sum + 1):
+                  dp[i][j] = dp[i - 1][j]  # 不选取当前元素
+                  if j >= nums[i - 1]:
+                      dp[i][j] += dp[i - 1][j - nums[i - 1]]  # 选取当前元素
+
+          return dp[len(nums)][target_sum]  # 返回达到目标和的方案数
+  ```
+
+  ​
 
 
 
