@@ -577,6 +577,35 @@ class Solution:
                 return total_sum - 2 * i
         
         return 0
+    
+    
+    
+    
+#递归的版本    
+from functools import lru_cache
+from typing import List
+
+class Solution:
+    def lastStoneWeightII(self, stones: List[int]) -> int:
+        total_sum = sum(stones)
+        target = total_sum // 2
+
+        @lru_cache(maxsize=None)
+        def dfs(i, curr_sum):
+            # 终止条件：没有石头了，返回当前累积的重量
+            if i == len(stones):
+                return curr_sum
+
+            # 如果加上当前石头不会超过 target，可以选择加或不加
+            take = 0
+            if curr_sum + stones[i] <= target:
+                take = dfs(i + 1, curr_sum + stones[i])
+            not_take = dfs(i + 1, curr_sum)
+
+            return max(take, not_take)
+
+        closest = dfs(0, 0)
+        return total_sum - 2 * closest
 ```
 
 # 目标和
@@ -664,6 +693,85 @@ https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0494.%E7%9B%AE
   ```
 
   ​
+
+
+# 一和零
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0474.%E4%B8%80%E5%92%8C%E9%9B%B6.md
+
+**这里本来是三维的dp 只不过 这里变成二维 ：类似于 经典01问题变成一维滚动数组**
+
+1.确定dp数组以及下标的含义：
+
+$$dp[i][j]$$：最多有i个0和j个1的strs的最大子集的大小为$$dp[i][j]$$。
+
+2.确定递推公式：
+
+$$dp[i][j] 可以由前一个strs里的字符串推导出来，strs里的字符串有zeroNum个0，oneNum个1。$$
+
+$$dp[i][j] 就可以是 dp[i - zeroNum][j - oneNum] + 1。$$
+
+然后我们在遍历的过程中，取$$dp[i][j]$$的最大值。
+
+所以递推公式：$$dp[i][j] = max(dp[i][j], dp[i - zeroNum][j - oneNum] + 1)$$;
+
+此时大家可以回想一下01背包的递推公式：dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+
+对比一下就会发现，字符串的zeroNum和oneNum相当于物品的重量（weight[i]），字符串本身的个数相当于物品的价值（value[i]）。
+
+**这就是一个典型的01背包！** 只不过物品的重量有了两个维度而已。
+
+3.一定是外层for循环遍历物品，内层for循环遍历背包容量且从后向前遍历！
+
+```python
+class Solution:
+    def findMaxForm(self, strs: List[str], m: int, n: int) -> int:
+        dp = [[0] * (n + 1) for _ in range(m + 1)]  # 创建二维动态规划数组，初始化为0
+        # 遍历物品
+        for s in strs:
+            ones = s.count('1')  # 统计字符串中1的个数
+            zeros = s.count('0')  # 统计字符串中0的个数
+            # 遍历背包容量且从后向前遍历
+            for i in range(m, zeros - 1, -1):
+                for j in range(n, ones - 1, -1):
+                    dp[i][j] = max(dp[i][j], dp[i - zeros][j - ones] + 1)  # 状态转移方程
+        return dp[m][n]
+      
+      
+      
+from functools import lru_cache
+
+def findMaxForm(strs, m, n):
+    # 预处理每个字符串中0和1的数量
+    counts = []
+    for s in strs:
+        zeros = s.count('0')
+        ones = s.count('1')
+        counts.append((zeros, ones))
+
+    @lru_cache(maxsize=None)
+    def dfs(index, zeros_left, ones_left):
+        # 递归终止条件：字符串用完了或容量用尽
+        if index == len(strs):
+            return 0
+
+        z, o = counts[index]
+
+        # 不选当前字符串
+        not_pick = dfs(index + 1, zeros_left, ones_left)
+
+        # 选当前字符串（前提是容量足够）
+        pick = 0
+        if zeros_left >= z and ones_left >= o:
+            pick = 1 + dfs(index + 1, zeros_left - z, ones_left - o)
+
+        return max(pick, not_pick)
+
+    return dfs(0, m, n)
+```
+
+
+
 
 
 
