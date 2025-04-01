@@ -456,6 +456,17 @@ for i in range(n):  # 应该先遍历物品，如果遍历背包容量放在上�
         dp[j] = max(dp[j], dp[j - weight[i]] + value[i])
 
 print(dp[bagweight])
+
+#这里解释下 为什么第二层for循环 是这样的
+#对于 j < weight[i] 的这些 j，j - weight[i] 是 负数，不合法！
+for i in range(n):
+    for j in range(bagweight + 1):
+        if j >= weight[i]:
+            dp[j] = max(dp[j], dp[j - weight[i]] + value[i])
+
+
+
+
 ```
 
 # 分割等和子集
@@ -770,9 +781,55 @@ def findMaxForm(strs, m, n):
     return dfs(0, m, n)
 ```
 
+# 完全背包
 
+普通0 1 背包问题的变体
 
+```python
+def complete_knapsack_2d(weight, value, bagweight):
+    n = len(weight)
+    dp = [[0] * (bagweight + 1) for _ in range(n)]
 
+    # 初始化第一行（第0号物品可以选多次）
+    for j in range(weight[0], bagweight + 1):
+        # 完全背包，物品可重复
+        dp[0][j] = (j // weight[0]) * value[0]
+
+    for i in range(1, n):  # 遍历物品
+        for j in range(bagweight + 1):  # 遍历容量
+            if j < weight[i]:
+                dp[i][j] = dp[i - 1][j]  # 不选当前物品
+            else:
+                # 完全背包：当前物品可以重复使用，所以用的是 dp[i][j - weight[i]]
+                dp[i][j] = max(
+                    dp[i - 1][j],                # 不选当前物品
+                    dp[i][j - weight[i]] + value[i]  # 选当前物品（可重复）
+                )
+
+    return dp[n - 1][bagweight]
+  
+  
+  
+
+def complete_knapsack(weight, value, bagweight):
+    n = len(weight)
+    dp = [0] * (bagweight + 1)
+
+    for i in range(n):  # 遍历每一个物品
+        for j in range(weight[i], bagweight + 1):  # 从前往后遍历容量（允许重复使用）
+            dp[j] = max(dp[j], dp[j - weight[i]] + value[i])
+
+    return dp[bagweight]
+```
+
+**注意 和 普通版的不同：**
+
+| 对比点      | 0-1 背包（二维）                               | 完全背包（二维）                                 |
+| -------- | ---------------------------------------- | :--------------------------------------- |
+| 可否重复选择物品 | ❌ 不能重复使用                                 | ✅ 可以重复使用                                 |
+| 状态转移公式   | $$ dp[i][j] = \max(dp[i-1][j],\ dp[i-1][j-w_i] + v_i) $$ | $$ dp[i][j] = \max(dp[i-1][j],\ dp[i][j-w_i] + v_i) $$ |
+| 状态转移依赖的行 | 依赖上一行 `i-1`（每个物品最多选一次）                   | 依赖当前行 `i`（当前物品可重复使用）                     |
+| 初始化第一行   | $$ dp[0][j] = v_0 \quad \text{(当 } j \geq w_0 \text{时)} $$ | $$ dp[0][j] = \left\lfloor \frac{j}{w_0} \right\rfloor \cdot v_0 $$ |
 
 
 
