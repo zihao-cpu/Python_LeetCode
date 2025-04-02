@@ -831,6 +831,24 @@ def complete_knapsack(weight, value, bagweight):
 | 状态转移依赖的行 | 依赖上一行 `i-1`（每个物品最多选一次）                   | 依赖当前行 `i`（当前物品可重复使用）                     |
 | 初始化第一行   | $$ dp[0][j] = v_0 \quad \text{(当 } j \geq w_0 \text{时)} $$ | $$ dp[0][j] = \left\lfloor \frac{j}{w_0} \right\rfloor \cdot v_0 $$ |
 
+# 组合总和
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0377.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8C%E2%85%A3.md
+
+完全背包
+
+```python 
+class Solution:
+    def combinationSum4(self, nums: List[int], target: int) -> int:
+        dp = [0] * (target + 1)  # 创建动态规划数组，用于存储组合总数
+        dp[0] = 1  # 初始化背包容量为0时的组合总数为1
+
+        for i in range(1, target + 1):  # 遍历背包容量
+            for j in nums:  # 遍历物品列表
+                if i >= j:  # 当背包容量大于等于当前物品重量时
+                    dp[i] += dp[i - j]  # 更新组合总数
+
+        return dp[-1]  # 返回背包容量为target时的组合总数
+```
 
 
