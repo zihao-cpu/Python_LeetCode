@@ -851,4 +851,101 @@ class Solution:
         return dp[-1]  # 返回背包容量为target时的组合总数
 ```
 
+# 完全平方数
 
+```python
+class Solution:
+    def numSquares(self, n: int) -> int:
+        dp = [float('inf')] * (n + 1)
+        dp[0] = 0
+
+        for i in range(1, int(n ** 0.5) + 1):  # 遍历物品
+            for j in range(i * i, n + 1):  # 遍历背包
+                # 更新凑成数字 j 所需的最少完全平方数数量
+                dp[j] = min(dp[j - i * i] + 1, dp[j])
+
+        return dp[n]
+        
+        
+class Solution:
+    def numSquares(self, n: int) -> int:
+        # 生成完全平方数列表
+        squares = [i * i for i in range(1, int(n ** 0.5) + 1)]
+        
+        # 初始化二维 DP 数组，dp[i][j] 表示使用前 i 个完全平方数来凑成 j 的最小完全平方数数量
+        dp = [[float('inf')] * (n + 1) for _ in range(len(squares) + 1)]
+        
+        # 初始化基准情况：dp[i][0] = 0，表示凑成 0 需要 0 个完全平方数
+        for i in range(len(squares) + 1):
+            dp[i][0] = 0
+        
+        # 填充 DP 表
+        for i in range(1, len(squares) + 1):
+            for target in range(1, n + 1):
+                # 不选择当前完全平方数
+                dp[i][target] = dp[i - 1][target]
+                # 选择当前完全平方数
+                if target >= squares[i - 1]:
+                    dp[i][target] = min(dp[i][target], dp[i][target - squares[i - 1]] + 1)
+        
+        return dp[len(squares)][n]
+
+# 示例使用
+solution = Solution()
+print(solution.numSquares(12))  # 输出 3，因为 12 = 4 + 4 + 4class Solution:
+    def numSquares(self, n: int) -> int:
+        # 生成完全平方数列表
+        squares = [i * i for i in range(1, int(n ** 0.5) + 1)]
+        
+        # 初始化二维 DP 数组，dp[i][j] 表示使用前 i 个完全平方数来凑成 j 的最小完全平方数数量
+        dp = [[float('inf')] * (n + 1) for _ in range(len(squares) + 1)]
+        
+        # 初始化基准情况：dp[i][0] = 0，表示凑成 0 需要 0 个完全平方数
+        for i in range(len(squares) + 1):
+            dp[i][0] = 0
+        
+        # 填充 DP 表
+        for i in range(1, len(squares) + 1):
+            for target in range(1, n + 1):
+                # 不选择当前完全平方数
+                dp[i][target] = dp[i - 1][target]
+                # 选择当前完全平方数
+                if target >= squares[i - 1]:
+                    dp[i][target] = min(dp[i][target], dp[i][target - squares[i - 1]] + 1)
+        
+        return dp[len(squares)][n]
+        
+class Solution:
+    def numSquares(self, n: int) -> int:
+        # 生成完全平方数列表
+        squares = [i * i for i in range(1, int(n ** 0.5) + 1)]
+        
+        # 递归函数，求解最小的完全平方数数量
+        def helper(target):
+            if target == 0:
+                return 0
+            min_count = float('inf')
+            for square in squares:
+                if target >= square:
+                    min_count = min(min_count, helper(target - square) + 1)
+            return min_count
+        
+        return helper(n)
+class Solution:
+    def numSquares(self, n: int) -> int:
+        # 生成完全平方数列表
+        squares = [i * i for i in range(1, int(n ** 0.5) + 1)]
+        
+        # 递归函数，求解最小的完全平方数数量
+        def helper(target):
+            if target == 0:
+                return 0
+            min_count = float('inf')
+            for square in squares:
+                if target >= square:
+                    min_count = min(min_count, helper(target - square) + 1)
+            return min_count
+        
+        return helper(n)
+
+```
