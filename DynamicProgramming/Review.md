@@ -837,6 +837,10 @@ https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0377.%E7%BB%84
 
 完全背包
 
+**如果求组合数就是外层for循环遍历物品，内层for遍历背包**。
+
+**如果求排列数就是外层for遍历背包，内层for循环遍历物品**。
+
 ```python 
 class Solution:
     def combinationSum4(self, nums: List[int], target: int) -> int:
@@ -850,6 +854,14 @@ class Solution:
 
         return dp[-1]  # 返回背包容量为target时的组合总数
 ```
+
+
+
+
+
+
+
+
 
 # 完全平方数
 
@@ -890,47 +902,8 @@ class Solution:
         
         return dp[len(squares)][n]
 
-# 示例使用
-solution = Solution()
-print(solution.numSquares(12))  # 输出 3，因为 12 = 4 + 4 + 4class Solution:
-    def numSquares(self, n: int) -> int:
-        # 生成完全平方数列表
-        squares = [i * i for i in range(1, int(n ** 0.5) + 1)]
+
         
-        # 初始化二维 DP 数组，dp[i][j] 表示使用前 i 个完全平方数来凑成 j 的最小完全平方数数量
-        dp = [[float('inf')] * (n + 1) for _ in range(len(squares) + 1)]
-        
-        # 初始化基准情况：dp[i][0] = 0，表示凑成 0 需要 0 个完全平方数
-        for i in range(len(squares) + 1):
-            dp[i][0] = 0
-        
-        # 填充 DP 表
-        for i in range(1, len(squares) + 1):
-            for target in range(1, n + 1):
-                # 不选择当前完全平方数
-                dp[i][target] = dp[i - 1][target]
-                # 选择当前完全平方数
-                if target >= squares[i - 1]:
-                    dp[i][target] = min(dp[i][target], dp[i][target - squares[i - 1]] + 1)
-        
-        return dp[len(squares)][n]
-        
-class Solution:
-    def numSquares(self, n: int) -> int:
-        # 生成完全平方数列表
-        squares = [i * i for i in range(1, int(n ** 0.5) + 1)]
-        
-        # 递归函数，求解最小的完全平方数数量
-        def helper(target):
-            if target == 0:
-                return 0
-            min_count = float('inf')
-            for square in squares:
-                if target >= square:
-                    min_count = min(min_count, helper(target - square) + 1)
-            return min_count
-        
-        return helper(n)
 class Solution:
     def numSquares(self, n: int) -> int:
         # 生成完全平方数列表
@@ -948,4 +921,67 @@ class Solution:
         
         return helper(n)
 
+```
+# 单词拆分
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0139.%E5%8D%95%E8%AF%8D%E6%8B%86%E5%88%86.md
+
+单词就是物品，字符串s就是背包，单词能否组成字符串s，就是问物品能不能把背包装满。
+
+拆分时可以重复使用字典中的单词，说明就是一个完全背包！
+
+1.确定dp数组和下标的意义：
+
+**dp[i] : 字符串长度为i的话，dp[i]为true，表示可以拆分为一个或多个在字典中出现的单词**。
+
+2.确认递归函数：
+
+如果确定dp[j] 是true，且 [j, i] 这个区间的子串出现在字典里，那么dp[i]一定是true。（j < i ）。
+
+所以递推公式是 if([j, i] 这个区间的子串出现在字典里 && dp[j]是true) 那么 dp[i] = true。
+
+3.初始化
+
+4.确定遍历顺序
+
+**如果求组合数就是外层for循环遍历物品，内层for遍历背包**。
+
+**如果求排列数就是外层for遍历背包，内层for循环遍历物品**。
+
+
+
+```python
+class Solution:
+    def wordBreak(self, s: str, wordDict: list[str]) -> bool:
+        wordSet = set(wordDict)
+        n = len(s)
+        dp = [[False] * (n + 1) for _ in range(n + 1)]  # dp[i][j] 表示 s[j:i] 可被拼出（注意：i > j）
+
+        for i in range(1, n + 1):  # i 表示右边界
+            for j in range(i):    # j 表示左边界
+                if s[j:i] in wordSet:
+                    if j == 0 or any(dp[j][k] for k in range(j)):
+                        dp[i][j] = True
+
+        # 检查是否存在一个 j，使得 dp[n][j] == True 并且前面的部分都可拼出
+        return any(dp[n][j] and (j == 0 or any(dp[j][k] for k in range(j))) for j in range(n))
+
+
+      
+      class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        wordSet = set(wordDict)
+        n = len(s)
+        dp = [False] * (n + 1)  # dp[i] 表示字符串的前 i 个字符是否可以被拆分成单词
+        dp[0] = True  # 初始状态，空字符串可以被拆分成单词
+
+        for i in range(1, n + 1): # 遍历背包
+            for j in range(i): # 遍历单词
+                if dp[j] and s[j:i] in wordSet:
+                    dp[i] = True  # 如果 s[0:j] 可以被拆分成单词，并且 s[j:i] 在单词集合中存在，则 s[0:i] 可以被拆分成单词
+                    break   改成二维dp     
+    
+    
+    
+    
 ```
