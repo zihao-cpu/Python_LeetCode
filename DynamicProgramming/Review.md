@@ -979,9 +979,73 @@ class Solution:
             for j in range(i): # 遍历单词
                 if dp[j] and s[j:i] in wordSet:
                     dp[i] = True  # 如果 s[0:j] 可以被拆分成单词，并且 s[j:i] 在单词集合中存在，则 s[0:i] 可以被拆分成单词
-                    break   改成二维dp     
+                    break     
     
     
     
     
 ```
+# 打家劫舍
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0198.%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8D.md
+
+1.确定dp数组和下标含义
+
+**dp[i]：考虑下标i（包括i）以内的房屋，最多可以偷窃的金额为dp[i]**。
+
+2.确定递推公式：
+
+如果偷第i房间，那么dp[i] = dp[i - 2] + nums[i] ，即：第i-1房一定是不考虑的，找出 下标i-2（包括i-2）以内的房屋，最多可以偷窃的金额为dp[i-2] 加上第i房间偷到的钱。
+
+如果不偷第i房间，那么dp[i] = dp[i - 1]，即考 虑i-1房，（**注意这里是考虑，并不是一定要偷i-1房，这是很多同学容易混淆的点**）
+
+  **$$dp[i][0] = max(dp[i-1][0], dp[i-1][1])$$  # 不抢劫第i个房屋，最大金额为前一个房屋抢劫和不抢劫的最大值** **注意这里！！！**
+
+
+
+然后dp[i]取最大值，即dp[i] = max(dp[i - 2] + nums[i], dp[i - 1]);
+
+3.初始化:
+
+从dp[i]的定义上来讲，dp[0] 一定是 nums[0]，dp[1]就是nums[0]和nums[1]的最大值即：dp[1] = max(nums[0], nums[1]);
+
+
+
+```python
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if len(nums) == 0:  # 如果没有房屋，返回0
+            return 0
+        if len(nums) == 1:  # 如果只有一个房屋，返回其金额
+            return nums[0]
+
+        # 创建一个动态规划数组，用于存储最大金额
+        dp = [0] * len(nums)
+        dp[0] = nums[0]  # 将dp的第一个元素设置为第一个房屋的金额
+        dp[1] = max(nums[0], nums[1])  # 将dp的第二个元素设置为第一二个房屋中的金额较大者
+
+        # 遍历剩余的房屋
+        for i in range(2, len(nums)):
+            # 对于每个房屋，选择抢劫当前房屋和抢劫前一个房屋的最大金额
+            dp[i] = max(dp[i - 2] + nums[i], dp[i - 1])
+
+        return dp[-1]  # 返回最后一个房屋中可抢劫的最大金额
+        
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if not nums:  # 如果没有房屋，返回0
+            return 0
+
+        n = len(nums)
+        dp = [[0, 0] for _ in range(n)]  # 创建二维动态规划数组，dp[i][0]表示不抢劫第i个房屋的最大金额，dp[i][1]表示抢劫第i个房屋的最大金额
+
+        dp[0][1] = nums[0]  # 抢劫第一个房屋的最大金额为第一个房屋的金额
+
+        for i in range(1, n):
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1])  # 不抢劫第i个房屋，最大金额为前一个房屋抢劫和不抢劫的最大值
+            dp[i][1] = dp[i-1][0] + nums[i]  # 抢劫第i个房屋，最大金额为前一个房屋不抢劫的最大金额加上当前房屋的金额
+
+        return max(dp[n-1][0], dp[n-1][1])  # 返回最后一个房屋中可抢劫的最大金额        
+        
+```
+
