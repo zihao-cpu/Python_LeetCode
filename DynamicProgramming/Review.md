@@ -1049,3 +1049,173 @@ class Solution:
         
 ```
 
+# 打家劫舍2
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0213.%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8DII.md
+
+- 情况一：考虑不包含首尾元素
+
+  ![213.打家劫舍II](https://camo.githubusercontent.com/7f391db0697aa01735429b2320c860ae36bf63ab2ea51794a28c077d995f5de8/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303132393136303734383634332d32303233303331303133343030303639322e6a7067)
+
+- 情况二：考虑包含首元素，不包含尾元素
+
+  ​
+
+- 情况三：考虑包含尾元素，不包含首元素
+
+![213.打家劫舍II2](https://camo.githubusercontent.com/07a36fda6455d107eb2dd352d0e38989f386959d12f010f81764e1ff36207db9/68747470733a2f2f636f64652d7468696e6b696e672d313235333835353039332e66696c652e6d7971636c6f75642e636f6d2f706963732f32303231303132393136303834323439312d32303233303331303133343030383133332e6a7067)
+
+**情况2、3 包含了 情况1**
+
+```python
+class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if len(nums) == 0:
+            return 0
+        if len(nums) == 1:
+            return nums[0]
+        
+        result1 = self.robRange(nums, 0, len(nums) - 2)  # 情况二
+        result2 = self.robRange(nums, 1, len(nums) - 1)  # 情况三
+        return max(result1, result2)
+    # 198.打家劫舍的逻辑
+    def robRange(self, nums: List[int], start: int, end: int) -> int:
+        if end == start:
+            return nums[start]
+        
+        prev_max = nums[start]
+        curr_max = max(nums[start], nums[start + 1])
+        
+        for i in range(start + 2, end + 1):
+            temp = curr_max
+            curr_max = max(prev_max + nums[i], curr_max)
+            prev_max = temp
+        
+        return curr_max
+        
+  class Solution:
+    def rob(self, nums: List[int]) -> int:
+        if len(nums) < 3:
+            return max(nums)
+
+        # 情况二：不抢劫第一个房屋
+        result1 = self.robRange(nums[:-1])
+
+        # 情况三：不抢劫最后一个房屋
+        result2 = self.robRange(nums[1:])
+
+        return max(result1, result2)
+
+    def robRange(self, nums):
+        dp = [[0, 0] for _ in range(len(nums))]
+        dp[0][1] = nums[0]
+
+        for i in range(1, len(nums)):
+            dp[i][0] = max(dp[i - 1])
+            dp[i][1] = dp[i - 1][0] + nums[i]
+
+        return max(dp[-1])
+      
+  
+```
+
+# 打家劫舍3
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0337.%E6%89%93%E5%AE%B6%E5%8A%AB%E8%88%8DIII.md
+
+**暴力递归的方法**
+
+
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def rob(self, root: TreeNode) -> int:
+        if root is None:
+            return 0
+        if root.left is None and root.right  is None:
+            return root.val
+        # 偷父节点
+        val1 = root.val
+        if root.left:
+            val1 += self.rob(root.left.left) + self.rob(root.left.right)
+        if root.right:
+            val1 += self.rob(root.right.left) + self.rob(root.right.right)
+        # 不偷父节点
+        val2 = self.rob(root.left) + self.rob(root.right)
+        return max(val1, val2)
+```
+
+**记忆化递归**
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    memory = {}
+    def rob(self, root: TreeNode) -> int:
+        if root is None:
+            return 0
+        if root.left is None and root.right  is None:
+            return root.val
+        if self.memory.get(root) is not None:
+            return self.memory[root]
+        # 偷父节点
+        val1 = root.val
+        if root.left:
+            val1 += self.rob(root.left.left) + self.rob(root.left.right)
+        if root.right:
+            val1 += self.rob(root.right.left) + self.rob(root.right.right)
+        # 不偷父节点
+        val2 = self.rob(root.left) + self.rob(root.right)
+        self.memory[root] = max(val1, val2)
+        return max(val1, val2)
+```
+
+**树形dp**
+
+而动态规划其实就是使用状态转移容器来记录状态的变化，这里可以使用一个长度为2的数组，记录当前节点偷与不偷所得到的的最大金钱。
+
+```python
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def rob(self, root: Optional[TreeNode]) -> int:
+        # dp数组（dp table）以及下标的含义：
+        # 1. 下标为 0 记录 **不偷该节点** 所得到的的最大金钱
+        # 2. 下标为 1 记录 **偷该节点** 所得到的的最大金钱
+        dp = self.traversal(root)
+        return max(dp)
+
+    # 要用后序遍历, 因为要通过递归函数的返回值来做下一步计算
+    def traversal(self, node):
+        
+        # 递归终止条件，就是遇到了空节点，那肯定是不偷的
+        if not node:
+            return (0, 0)
+
+        left = self.traversal(node.left)
+        right = self.traversal(node.right)
+
+        # 不偷当前节点, 偷子节点
+        val_0 = max(left[0], left[1]) + max(right[0], right[1])
+
+        # 偷当前节点, 不偷子节点
+        val_1 = node.val + left[0] + right[0]
+
+        return (val_0, val_1)
+```
+
