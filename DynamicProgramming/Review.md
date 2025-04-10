@@ -1219,7 +1219,7 @@ class Solution:
         return (val_0, val_1)
 ```
 
-# 买卖股票的最佳时机
+# 买卖股票的最佳时机(交易一次)
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0121.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BA.md
 
@@ -1272,3 +1272,110 @@ class Solution:
         return dp1
 ```
 
+# 买卖股票的最佳时机2(交易多次)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0122.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAII%EF%BC%88%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%EF%BC%89.md
+
+如果第i天持有股票即$$dp[i][0]$$， 那么可以由两个状态推出来
+
+- 第i-1天就持有股票，那么就保持现状，所得现金就是昨天持有股票的所得现金 即：$$dp[i - 1][0]$$
+- 第i天买入股票，所得现金就是昨天不持有股票的所得现金减去 今天的股票价格 即：$$dp[i - 1][1] - prices[i]$$
+
+如果第i天不持有股票即dp[i][1]的情况， 依然可以由两个状态推出来
+
+- 第i-1天就不持有股票，那么就保持现状，所得现金就是昨天不持有股票的所得现金 即：$$dp[i - 1][1]$$
+- 第i天卖出股票，所得现金就是按照今天股票价格卖出后所得现金即：$$prices[i] + dp[i - 1][0]$$
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        length = len(prices)
+        dp0, dp1 = -prices[0], 0 #注意这里只维护两个常量，因为dp0的更新不受dp1的影响
+        for i in range(1, length):
+            dp1 = max(dp1, dp0 + prices[i])
+            dp0 = max(dp0, dp1-prices[i])
+        return dp1
+```
+
+# 买卖股票的最佳时机3(最多两次)
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0123.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAIII.md
+
+1.定义dp数组含义：
+
+0.没有操作 （其实我们也可以不设置这个状态）
+
+1.第一次持有股票
+
+2.第一次不持有股票
+
+3.第二次持有股票
+
+4.第二次不持有股票
+
+$$dp[i][j]$$中 i表示第i天，j为 [0 - 4] 五个状态，$$dp[i][j]$$表示第i天状态j所剩最大现金。
+
+2.1达到$$dp[i][1]$$状态，有两个具体操作：
+
+- 操作一：第i天买入股票了，那么$$dp[i][1] = dp[i-1][0] - prices[i]$$
+- 操作二：第i天没有操作，而是沿用前一天买入的状态，即：$$dp[i][1] = dp[i - 1][1]$$
+
+$$dp[i][1] = max(dp[i-1][0] - prices[i], dp[i - 1][1]);$$
+
+2.2同理$$dp[i][2]$$也有两个操作
+
+- 操作一：第i天卖出股票了，那么$$dp[i][2] = dp[i - 1][1] + prices[i]$$
+- 操作二：第i天没有操作，沿用前一天卖出股票的状态，即：$$dp[i][2] = dp[i - 1][2]$$
+
+$$dp[i][2] = max(dp[i - 1][1] + prices[i], dp[i - 1][2])$$
+
+2.3递推
+
+$$dp[i][3] = max(dp[i - 1][3], dp[i - 1][2] - prices[i]);$$
+
+$$dp[i][4] = max(dp[i - 1][4], dp[i - 1][3] + prices[i]);$$
+
+3.初始化
+
+第0天没有操作，这个最容易想到，就是0，即：$$dp[0][0] = 0;$$
+
+第0天做第一次买入的操作，$$dp[0][1] = -prices[0];$$
+
+此时还没有买入，怎么就卖出呢？ 其实大家可以理解当天买入，当天卖出，所以$$dp[0][2] = 0;$$
+
+所以第二次买入操作，初始化为：$$dp[0][3] = -prices[0];$$
+
+同理第二次卖出初始化$$dp[0][4] = 0;$$
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        if len(prices) == 0:
+            return 0
+        dp = [[0] * 5 for _ in range(len(prices))]
+        dp[0][1] = -prices[0]
+        dp[0][3] = -prices[0]
+        for i in range(1, len(prices)):
+            dp[i][0] = dp[i-1][0]
+            dp[i][1] = max(dp[i-1][1], dp[i-1][0] - prices[i])
+            dp[i][2] = max(dp[i-1][2], dp[i-1][1] + prices[i])
+            dp[i][3] = max(dp[i-1][3], dp[i-1][2] - prices[i])
+            dp[i][4] = max(dp[i-1][4], dp[i-1][3] + prices[i])
+        return dp[-1][4]
+        
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        if len(prices) == 0:
+            return 0
+        dp = [0] * 5 
+        dp[1] = -prices[0]
+        dp[3] = -prices[0]
+        for i in range(1, len(prices)):
+            dp[1] = max(dp[1], dp[0] - prices[i])
+            dp[2] = max(dp[2], dp[1] + prices[i])
+            dp[3] = max(dp[3], dp[2] - prices[i])
+            dp[4] = max(dp[4], dp[3] + prices[i])
+        return dp[4]        
+        
+        
+```
