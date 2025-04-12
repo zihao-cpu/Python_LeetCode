@@ -1379,3 +1379,25 @@ class Solution:
         
         
 ```
+# 买卖股票的最佳时机4
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0188.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BAIV.md
+
+```python
+class Solution:
+    def maxProfit(self, k: int, prices: List[int]) -> int:
+        if len(prices) == 0:
+            return 0
+        dp = [[0] * (2*k+1) for _ in range(len(prices))]
+        for j in range(1, 2*k, 2):
+            dp[0][j] = -prices[0]
+        for i in range(1, len(prices)):
+            for j in range(0, 2*k-1, 2):
+                dp[i][j+1] = max(dp[i-1][j+1], dp[i-1][j] - prices[i])
+                dp[i][j+2] = max(dp[i-1][j+2], dp[i-1][j+1] + prices[i])
+        return dp[-1][2*k]
+      
+      
+     
+```
+
