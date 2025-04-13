@@ -1462,3 +1462,23 @@ class Solution:
 
 ```
 
+# 买卖股票的最佳时机含手续费
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0714.%E4%B9%B0%E5%8D%96%E8%82%A1%E7%A5%A8%E7%9A%84%E6%9C%80%E4%BD%B3%E6%97%B6%E6%9C%BA%E5%90%AB%E6%89%8B%E7%BB%AD%E8%B4%B9%EF%BC%88%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%EF%BC%89.md
+
+在**买卖股票的最佳时机2**基础上 修改
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int], fee: int) -> int:
+        n = len(prices)
+        dp = [[0] * 2 for _ in range(n)]
+        dp[0][0] = -prices[0] #持股票
+        for i in range(1, n):
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1] - prices[i])
+            dp[i][1] = max(dp[i-1][1], dp[i-1][0] + prices[i] - fee)
+        return max(dp[-1][0], dp[-1][1])
+```
+
+
+
