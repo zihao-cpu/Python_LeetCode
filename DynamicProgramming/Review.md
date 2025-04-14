@@ -1480,5 +1480,36 @@ class Solution:
         return max(dp[-1][0], dp[-1][1])
 ```
 
+# 最长上升子序列
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0300.%E6%9C%80%E9%95%BF%E4%B8%8A%E5%8D%87%E5%AD%90%E5%BA%8F%E5%88%97.md
+
+1.dp的定义:
+
+**dp[i]表示i之前包括i的以nums[i]结尾的最长递增子序列的长度**
+
+2.状态转移方程：
+
+位置i的最长升序子序列等于j从0到i-1各个位置的最长升序子序列 + 1 的最大值。
+
+所以：if (nums[i] > nums[j]) dp[i] = max(dp[i], dp[j] + 1);
+
+3.初始化:
+
+一个i，对应的dp[i]（即最长递增子序列）起始大小至少都是1.
+
+```python
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        if len(nums) <= 1:
+            return len(nums)
+        dp = [1] * len(nums)
+        result = 1
+        for i in range(1, len(nums)):
+            for j in range(0, i):
+                if nums[i] > nums[j]:
+                    dp[i] = max(dp[i], dp[j] + 1)
+            result = max(result, dp[i]) #取长的子序列
+        return result
+```
 
