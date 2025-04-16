@@ -1513,3 +1513,36 @@ class Solution:
         return result
 ```
 
+# 最长连续递增序列
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0674.%E6%9C%80%E9%95%BF%E8%BF%9E%E7%BB%AD%E9%80%92%E5%A2%9E%E5%BA%8F%E5%88%97.md
+
+1.dp的定义:
+
+**dp[i]表示i之前包括i的以nums[i]结尾的最长连续递增子序列的长度**
+
+2.状态转移方程：
+
+如果 nums[i] > nums[i - 1]，那么以 i 为结尾的连续递增的子序列长度 一定等于 以i - 1为结尾的连续递增的子序列长度 + 1 。
+
+dp[i] = dp[i - 1] + 1;
+
+3.初始化：
+
+以下标i为结尾的连续递增的子序列长度最少也应该是1，即就是nums[i]这一个元素。
+
+所以dp[i]应该初始1;
+
+```python
+class Solution:
+    def findLengthOfLCIS(self, nums: List[int]) -> int:
+        if len(nums) == 0:
+            return 0
+        result = 1
+        dp = [1] * len(nums)
+        for i in range(len(nums)-1):
+            if nums[i+1] > nums[i]: #连续记录
+                dp[i+1] = dp[i] + 1
+            result = max(result, dp[i+1])
+        return result
+```
