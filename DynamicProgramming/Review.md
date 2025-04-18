@@ -1546,3 +1546,49 @@ class Solution:
             result = max(result, dp[i+1])
         return result
 ```
+# 最长重复子数组
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0718.%E6%9C%80%E9%95%BF%E9%87%8D%E5%A4%8D%E5%AD%90%E6%95%B0%E7%BB%84.md
+
+1.确定dp数组
+
+$$dp[i][j]$$ ：以下标i - 1为结尾的A，和以下标j - 1为结尾的B，最长重复子数组长度为$$dp[i][j]$$。
+
+2.确定递推公式
+
+根据$$dp[i][j]$$的定义，$$dp[i][j$$的状态只能由$$dp[i - 1][j - 1]$$推导出来。
+
+即当A[i - 1] 和B[j - 1]相等的时候，$$dp[i][j] = dp[i - 1][j - 1] + 1$$;
+
+根据递推公式可以看出，遍历i 和 j 要从1开始！
+
+3.初始化
+
+所以dp[i][0] 和dp[0][j]初始化为0。
+
+```python
+class Solution:
+    def findLength(self, nums1: List[int], nums2: List[int]) -> int:
+        # 创建一个二维数组 dp，用于存储最长公共子数组的长度
+        dp = [[0] * (len(nums2) + 1) for _ in range(len(nums1) + 1)]
+        # 记录最长公共子数组的长度
+        result = 0
+
+        # 遍历数组 nums1
+        for i in range(1, len(nums1) + 1):
+            # 遍历数组 nums2
+            for j in range(1, len(nums2) + 1):
+                # 如果 nums1[i-1] 和 nums2[j-1] 相等
+                if nums1[i - 1] == nums2[j - 1]:
+                    # 在当前位置上的最长公共子数组长度为前一个位置上的长度加一
+                    dp[i][j] = dp[i - 1][j - 1] + 1
+                # 更新最长公共子数组的长度
+                if dp[i][j] > result:
+                    result = dp[i][j]
+
+        # 返回最长公共子数组的长度
+        return result
+```
+
+
+
