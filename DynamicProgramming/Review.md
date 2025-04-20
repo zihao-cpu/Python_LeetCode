@@ -1550,6 +1550,11 @@ class Solution:
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0718.%E6%9C%80%E9%95%BF%E9%87%8D%E5%A4%8D%E5%AD%90%E6%95%B0%E7%BB%84.md
 
+- A: [1,2,3,2,1]
+- B: [3,2,1,4,7]
+- 输出：3
+- 解释：长度最长的公共子数组是 [3, 2, 1] 。
+
 1.确定dp数组
 
 $$dp[i][j]$$ ：以下标i - 1为结尾的A，和以下标j - 1为结尾的B，最长重复子数组长度为$$dp[i][j]$$。
@@ -1594,6 +1599,10 @@ class Solution:
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/1143.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97.md
 
+- 输入：text1 = "abcde", text2 = "ace"
+- 输出：3
+- 解释：最长公共子序列是 "ace"，它的长度为 3。
+
 1.确定含义 ：
 
 $$dp[i][j]$$：长度为[0, i - 1]的字符串text1与长度为[0, j - 1]的字符串text2的最长公共子序列为$$dp[i][j]$$
@@ -1624,5 +1633,109 @@ class Solution:
         return dp[len(text1)][len(text2)]
 ```
 
+# 不相交的线
 
+解法同上一题
+
+
+
+# 最大子序和
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0053.%E6%9C%80%E5%A4%A7%E5%AD%90%E5%BA%8F%E5%92%8C.md
+
+贪心的做法:
+
+局部最优：当前“连续和”为负数的时候立刻放弃，从下一个元素重新计算“连续和”，因为负数加上下一个元素 “连续和”只会越来越小。**遍历 nums，从头开始用 count 累积，如果 count 一旦加上 nums[i]变为负数，那么就应该从 nums[i+1]开始从 0 累积 count 了，因为已经变为负数的 count，只会拖累总和。**
+
+```python
+def maxSubArray(self, nums):
+    result = float('-inf')  # 初始化结果为负无穷大
+    count = 0
+    for i in range(len(nums)):
+        count += nums[i]
+        if count > result:  # 取区间累计的最大值（相当于不断确定最大子序终止位置）
+            result = count
+        if count <= 0:  # 相当于重置最大子序起始位置，因为遇到负数一定是拉低总和
+            count = 0
+    return result
+```
+1.确定dp 含义：
+
+**dp[i]：包括下标i（以nums[i]为结尾）的最大连续子序列和为dp[i]**。
+
+2.递推公式：
+
+dp[i]只有两个方向可以推出来：
+
+- dp[i - 1] + nums[i]，即：nums[i]加入当前连续子序列和
+- nums[i]，即：从头开始计算当前连续子序列和
+- 一定是取最大的，所以dp[i] = max(dp[i - 1] + nums[i], nums[i]);
+
+```python
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        dp = [0] * len(nums)
+        dp[0] = nums[0]
+        result = dp[0]
+        for i in range(1, len(nums)):
+            dp[i] = max(dp[i-1] + nums[i], nums[i]) #状态转移公式
+            result = max(result, dp[i]) #result 保存dp[i]的最大值
+        return result
+      
+      
+  #递归的写法
+  class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        from functools import lru_cache
+
+        n = len(nums)
+
+        @lru_cache(maxsize=None)  # 记忆化递归
+        def helper(i):
+            if i == 0:
+                return nums[0]
+            return max(helper(i - 1) + nums[i], nums[i])
+
+        # 扫描所有 i，找出最大值
+        return max(helper(i) for i in range(n))
+    
+```
+
+# 判断子序列
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0392.%E5%88%A4%E6%96%AD%E5%AD%90%E5%BA%8F%E5%88%97.md
+
+1.确定dp 的含义
+
+**$$dp[i][j]$$ 表示以下标i-1为结尾的字符串s，和以下标j-1为结尾的字符串t，相同子序列的长度为$$dp[i][j]$$**。
+
+2.确定递推公式
+
+在确定递推公式的时候，首先要考虑如下两种操作，整理如下：
+
+- if (s[i - 1] == t[j - 1])
+  - t中找到了一个字符在s中也出现了
+- if (s[i - 1] != t[j - 1])
+  - 相当于t要删除元素，继续匹配
+
+if (s[i - 1] == t[j - 1])，那么$$dp[i][j] = dp[i - 1][j - 1] + 1$$;，因为找到了一个相同的字符，相同子序列长度自然要在dp[i-1][j-1]的基础上加1（**如果不理解，在回看一下$$dp[i][j]$$的定义**）
+
+if (s[i - 1] != t[j - 1])，此时相当于t要删除元素，t如果把当前元素t[j - 1]删除，那么dp[i][j] 的数值就是 看s[i - 1]与 t[j - 2]的比较结果了，即：dp[i][j] = dp[i][j - 1];
+
+其实这里 大家可以发现和 [1143.最长公共子序列](https://programmercarl.com/1143.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97.html) 的递推公式基本那就是一样的，区别就是 本题 如果删元素一定是字符串t，而 1143.最长公共子序列 是两个字符串都可以删元素。
+
+```python
+class Solution:
+    def isSubsequence(self, s: str, t: str) -> bool:
+        dp = [[0] * (len(t)+1) for _ in range(len(s)+1)]
+        for i in range(1, len(s)+1):
+            for j in range(1, len(t)+1):
+                if s[i-1] == t[j-1]:
+                    dp[i][j] = dp[i-1][j-1] + 1
+                else:
+                    dp[i][j] = dp[i][j-1]
+        if dp[-1][-1] == len(s):
+            return True
+        return False
+```
 
