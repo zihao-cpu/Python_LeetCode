@@ -1827,3 +1827,58 @@ class Solution:
         return dp[-1][-1]
 ```
 
+# 编辑距离
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0072.%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB.md
+
+给你两个单词 word1 和 word2，请你计算出将 word1 转换成 word2 所使用的最少操作数 。
+
+你可以对一个单词进行如下三种操作：
+
+- 插入一个字符
+
+- 删除一个字符
+
+- 替换一个字符
+
+  ​
+
+1.确定dp 数组
+
+$$dp[i][j]$$ 表示以下标i-1为结尾的字符串word1，和以下标j-1为结尾的字符串word2，最近编辑距离为$$dp[i][j]$$。
+
+2.确定递推公式
+
+`if (word1[i - 1] == word2[j - 1])` 那么说明不用任何编辑，`dp[i][j]` 就应该是 `dp[i - 1][j - 1]`，即`dp[i][j] = dp[i - 1][j - 1];`
+
+此时可能有同学有点不明白，为啥要即`dp[i][j] = dp[i - 1][j - 1]`呢？
+
+那么就在回顾上面讲过的`dp[i][j]`的定义，`word1[i - 1]` 与 `word2[j - 1]`相等了，那么就不用编辑了，以下标i-2为结尾的字符串word1和以下标j-2为结尾的字符串`word2`的最近编辑距离`dp[i - 1][j - 1]`就是 `dp[i][j]`了。
+
+`if (word1[i - 1] != word2[j - 1])`，此时就需要编辑了，如何编辑呢？
+
+- 操作一：word1删除一个元素，那么就是以下标i - 2为结尾的word1 与 j-1为结尾的word2的最近编辑距离 再加上一个操作。即 `dp[i][j] = dp[i - 1][j] + 1;`
+- 操作二：word2删除一个元素，那么就是以下标i - 1为结尾的word1 与 j-2为结尾的word2的最近编辑距离 再加上一个操作。即 `dp[i][j] = dp[i][j - 1] + 1;`
+- 操作三：替换元素，`word1`替换`word1[i - 1]`，使其与`word2[j - 1]`相同，此时不用增删加元素。可以回顾一下，`if (word1[i - 1] == word2[j - 1])`的时候我们的操作 是 `dp[i][j] = dp[i - 1][j - 1]` 。那么只需要一次替换的操作，就可以让 word1[i - 1] 和 word2[j - 1] 相同。所以 `dp[i][j] = dp[i - 1][j - 1] + 1;`
+
+3.初始化
+
+$$dp[i][0]$$ ：以下标i-1为结尾的字符串word1，和空字符串word2，最近编辑距离为$$dp[i][0]$$。那么$$dp[i][0]$$就应该是i，对word1里的元素全部做删除操作，即：$$dp[i][0] = i$$;同理$$dp[0][j] = j$$;
+
+```python
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        dp = [[0] * (len(word2)+1) for _ in range(len(word1)+1)]
+        for i in range(len(word1)+1):
+            dp[i][0] = i
+        for j in range(len(word2)+1):
+            dp[0][j] = j
+        for i in range(1, len(word1)+1):
+            for j in range(1, len(word2)+1):
+                if word1[i-1] == word2[j-1]:
+                    dp[i][j] = dp[i-1][j-1]
+                else:
+                    dp[i][j] = min(dp[i-1][j-1], dp[i-1][j], dp[i][j-1]) + 1
+        return dp[-1][-1]v
+```
+
