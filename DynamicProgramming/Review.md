@@ -1896,7 +1896,7 @@ https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0647.%E5%9B%9E
 
 整体上是两种，就是s[i]与s[j]相等，s[i]与s[j]不相等这两种。
 
-当s[i]与s[j]不相等，那没啥好说的了，dp[i][j]一定是false。
+当s[i]与s[j]不相等，那没啥好说的了，$$dp[i][j]$$一定是false。
 
 当s[i]与s[j]相等时，这就复杂一些了，有如下三种情况
 
@@ -1941,5 +1941,72 @@ class Solution:
             res += 1
         return res       
         
+```
+
+# 最长回文子序列
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0516.%E6%9C%80%E9%95%BF%E5%9B%9E%E6%96%87%E5%AD%90%E5%BA%8F%E5%88%97.md
+
+1.确定 dp数组
+
+**$$dp[i][j]$$：字符串s在[i, j]范围内最长的回文子序列的长度为$$dp[i][j]$$**。
+
+2.确定递推公式
+
+在判断回文子串的题目中，关键逻辑就是看s[i]与s[j]是否相同。
+
+如果s[i]与s[j]相同，那么$$dp[i][j] = dp[i + 1][j - 1] + 2$$;
+
+如果s[i]与s[j]不相同，说明s[i]和s[j]的同时加入 并不能增加[i,j]区间回文子序列的长度，那么分别加入s[i]、s[j]看看哪一个可以组成最长的回文子序列。
+
+加入s[j]的回文子序列长度为$$dp[i + 1][j]$$。
+
+加入s[i]的回文子序列长度为$$dp[i][j - 1]$$。
+
+那么$$dp[i][j]$$一定是取最大的，即：$$dp[i][j] = max(dp[i + 1][j], dp[i][j - 1])$$;
+
+
+
+```python
+class Solution:
+    def longestPalindromeSubseq(self, s: str) -> int:
+        dp = [[0] * len(s) for _ in range(len(s))]
+        for i in range(len(s)):
+            dp[i][i] = 1
+        for i in range(len(s)-1, -1, -1):
+            for j in range(i+1, len(s)):
+                if s[i] == s[j]:
+                    dp[i][j] = dp[i+1][j-1] + 2
+                else:
+                    dp[i][j] = max(dp[i+1][j], dp[i][j-1])
+        return dp[0][-1]
+          
+  #递归的写法
+  class Solution:
+    def longestPalindromeSubseq(self, s: str) -> int:
+        # 用字典来存储已经计算过的子问题的结果
+        memo = {}
+        
+        # 定义递归函数，计算子串 s[i:j+1] 的最长回文子序列
+        def helper(i, j):
+            # 如果子串为空或只有一个字符，返回 0 或 1
+            if i > j:
+                return 0
+            if i == j:
+                return 1
+            # 如果已经计算过这个子问题，直接返回结果
+            if (i, j) in memo:
+                return memo[(i, j)]
+            
+            # 如果 s[i] == s[j]，说明这两个字符可以组成回文的一部分
+            if s[i] == s[j]:
+                memo[(i, j)] = 2 + helper(i + 1, j - 1)  # 包括这两个字符
+            else:
+                memo[(i, j)] = max(helper(i + 1, j), helper(i, j - 1))  # 跳过一个字符，比较两种情况
+
+            return memo[(i, j)]
+        
+        # 从整个字符串开始递归
+        return helper(0, len(s) - 1)
 ```
 
