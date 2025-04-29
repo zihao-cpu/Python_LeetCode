@@ -2010,3 +2010,54 @@ class Solution:
         return helper(0, len(s) - 1)
 ```
 
+# 找两个和为目标值且不重叠的子数组
+
+力扣1477
+
+输入：arr = [7,3,4,7], target = 7
+
+输出：2
+
+解释：尽管我们有 3 个互不重叠的子数组和为 7 （[7], [3,4] 和 [7]），但我们会选择第一个和第三个子数组，因为它们的长度和 2 是最小值。
+
+如果当前窗口window[l...r]这个子数组符合条件，题目要求非重叠，那么我们只需要知道窗口左边是否有子数组满足题目给出的条件，且长度最短，那么可以用dp得出。
+定义pre[r+1]代表了arr[0...r]中满足条件的子数组的最小长度，转移方程为：
+
+如果当前窗口满足条件：pre[r+1]=min(pre[r],r−l+1)
+如果当前窗口不满足条件：pre[r+1]=pre[r]
+
+作者：以诚
+链接：https://leetcode.cn/problems/find-two-non-overlapping-sub-arrays-each-with-target-sum/solutions/3030794/qian-zhui-he-hua-dong-chuang-kou-dp-by-y-vs6l/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
+```python
+class Solution:
+    def minSumOfLengths(self, arr: List[int], target: int) -> int:
+        """
+            只有正数，启示我们随着数个数增加，只会增，不会减
+            可以用滑动窗口
+        """
+        n = len(arr)
+        pre = [inf] * (n + 1)
+        l = 0
+        res = inf
+        s = list(accumulate(arr,initial = 0))
+        for r in range(n):
+            while s[r + 1] - s[l] > target:
+                l += 1
+            if s[r + 1] - s[l] == target:
+                res = min(res,pre[l] + r - l + 1)
+                pre[r + 1] = min(pre[r],r - l + 1)
+            else:
+                pre[r + 1] = pre[r]
+        return  res if res < inf else -1
+
+作者：以诚
+链接：https://leetcode.cn/problems/find-two-non-overlapping-sub-arrays-each-with-target-sum/solutions/3030794/qian-zhui-he-hua-dong-chuang-kou-dp-by-y-vs6l/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+
+
