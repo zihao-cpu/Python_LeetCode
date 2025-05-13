@@ -40,5 +40,40 @@
 | 7     | 6     | 6 入栈           | [2, 4, 6]    | 元素 6 的左侧第一个比 6 小的元素是：4 |
 | 8     | 8     | 8 入栈           | [2, 4, 6, 8] | 元素 8 的左侧第一个比 8 小的元素是：6 |
 
-
 原文链接：https://blog.csdn.net/zy_dreamer/article/details/131036101
+
+# 每日温度
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0739.%E6%AF%8F%E6%97%A5%E6%B8%A9%E5%BA%A6.md
+
+```python
+class Solution:
+    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        answer = [0]*len(temperatures)
+        stack = []
+        for i in range(len(temperatures)):
+            while len(stack)>0 and temperatures[i] > temperatures[stack[-1]]:
+                answer[stack[-1]] = i - stack[-1]
+                stack.pop()
+            stack.append(i)
+        return answer
+      
+      
+class Solution:
+    def dailyTemperatures(self, temperatures: List[int]) -> List[int]:
+        answer = [0]*len(temperatures)
+        stack = [0]
+        for i in range(1,len(temperatures)):
+            # 情况一和情况二
+            if temperatures[i]<=temperatures[stack[-1]]:
+                stack.append(i)
+            # 情况三
+            else:
+                while len(stack) != 0 and temperatures[i]>temperatures[stack[-1]]:
+                    answer[stack[-1]]=i-stack[-1]
+                    stack.pop()
+                stack.append(i)
+
+        return answer
+```
+
