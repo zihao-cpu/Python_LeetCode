@@ -42,6 +42,33 @@
 
 原文链接：https://blog.csdn.net/zy_dreamer/article/details/131036101
 
+
+
+```python
+def monotonic_decreasing_stack(arr):
+    stack = []
+    result = []
+
+    for i, num in enumerate(arr):
+        while stack and arr[stack[-1]] < num:
+            stack.pop()
+        if stack:
+            result.append(stack[-1])  # 记录前一个更大元素的下标
+        else:
+            result.append(-1)
+        stack.append(i)
+    
+    return result
+```
+
+
+
+
+
+
+
+
+
 # 每日温度
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0739.%E6%AF%8F%E6%97%A5%E6%B8%A9%E5%BA%A6.md
@@ -75,5 +102,36 @@ class Solution:
                 stack.append(i)
 
         return answer
+```
+
+
+
+# 下一个元素
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/0496.%E4%B8%8B%E4%B8%80%E4%B8%AA%E6%9B%B4%E5%A4%A7%E5%85%83%E7%B4%A0I.md
+
+保证栈是单调递增的
+
+判断数组2的元素 是否在数组1中出现过
+
+```python
+class Solution:
+    def nextGreaterElement(self, nums1: List[int], nums2: List[int]) -> List[int]:
+        result = [-1]*len(nums1)
+        stack = [0]
+        for i in range(1,len(nums2)):
+            # 情况一情况二
+            if nums2[i]<=nums2[stack[-1]]:
+                stack.append(i)
+            # 情况三
+            else:
+                while len(stack)!=0 and nums2[i]>nums2[stack[-1]]:
+                    if nums2[stack[-1]] in nums1:
+                        index = nums1.index(nums2[stack[-1]])
+                        result[index]=nums2[i]
+                    stack.pop()                 
+                stack.append(i)
+        return result
+
 ```
 
