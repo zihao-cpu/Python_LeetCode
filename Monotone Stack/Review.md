@@ -234,3 +234,28 @@ class Solution:
         return result
 ```
 
+双指针的解法
+
+`leftheight` 数组表示从左边看每个位置左侧（包含当前位置）的最高柱子高度
+
+`rightheight` 数组表示从右边看每个位置右侧（包含当前位置）的最高柱子高度。
+
+```python
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        leftheight, rightheight = [0]*len(height), [0]*len(height)
+
+        leftheight[0]=height[0]
+        for i in range(1,len(height)):
+            leftheight[i]=max(leftheight[i-1],height[i])
+        rightheight[-1]=height[-1]
+        for i in range(len(height)-2,-1,-1):
+            rightheight[i]=max(rightheight[i+1],height[i])
+
+        result = 0
+        for i in range(0,len(height)):
+            summ = min(leftheight[i],rightheight[i])-height[i]
+            result += summ
+        return result
+```
+
