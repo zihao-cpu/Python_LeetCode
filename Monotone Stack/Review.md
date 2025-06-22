@@ -259,3 +259,46 @@ class Solution:
         return result
 ```
 
+# 柱状图中最大的矩形
+
+https://github.com/youngyangyang04/leetcode-master/blob/master/problems/0084.%E6%9F%B1%E7%8A%B6%E5%9B%BE%E4%B8%AD%E6%9C%80%E5%A4%A7%E7%9A%84%E7%9F%A9%E5%BD%A2.md
+
+```python
+# 双指针 
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        size = len(heights)
+        # 两个DP数列储存的均是下标index
+        min_left_index = [0] * size
+        min_right_index = [0] * size
+        result = 0
+
+        # 记录每个柱子的左侧第一个矮一级的柱子的下标
+        min_left_index[0] = -1  # 初始化防止while死循环
+        for i in range(1, size):
+            # 以当前柱子为主心骨，向左迭代寻找次级柱子
+            temp = i - 1
+            while temp >= 0 and heights[temp] >= heights[i]:
+                # 当左侧的柱子持续较高时，尝试这个高柱子自己的次级柱子（DP
+                temp = min_left_index[temp]
+            # 当找到左侧矮一级的目标柱子时
+            min_left_index[i] = temp
+        
+        # 记录每个柱子的右侧第一个矮一级的柱子的下标
+        min_right_index[size-1] = size  # 初始化防止while死循环
+        for i in range(size-2, -1, -1):
+            # 以当前柱子为主心骨，向右迭代寻找次级柱子
+            temp = i + 1
+            while temp < size and heights[temp] >= heights[i]:
+                # 当右侧的柱子持续较高时，尝试这个高柱子自己的次级柱子（DP
+                temp = min_right_index[temp]
+            # 当找到右侧矮一级的目标柱子时
+            min_right_index[i] = temp
+        
+        for i in range(size):
+            area = heights[i] * (min_right_index[i] - min_left_index[i] - 1)
+            result = max(area, result)
+        
+        return result
+```
+
