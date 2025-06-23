@@ -20,6 +20,7 @@ def largestExtraRectangle(heights):
         while temp >=0 and heights[temp]>=heights[i]:
             temp=min_left_index[temp]
         min_left_index[i]=temp
+    print(min_left_index)
     #记录每一个柱子的右侧第一个矮一级的柱子的位置
     min_right_index[size-1]=size
     for i in range(size-2,-1,-1):
@@ -27,8 +28,12 @@ def largestExtraRectangle(heights):
         while temp<size and heights[temp]>=heights[i]:
             temp=min_right_index[temp]
         min_right_index[i]=temp
+    print(min_right_index)
     #计算面积
     for i in range(size):
+        print(heights[i]*(min_right_index[i]-min_left_index[i]-1))
         result=max(result,heights[i]*(min_right_index[i]-min_left_index[i]-1))
     return result
-    
+if __name__ == '__main__':
+    heights=[3,2,4,1]
+    print(largestExtraRectangle(heights))

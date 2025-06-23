@@ -274,6 +274,7 @@ class Solution:
         result = 0
 
         # 记录每个柱子的左侧第一个矮一级的柱子的下标
+        #例如heights=[3,2,4,3] -> min_left_index=[-1,-1,1,1]
         min_left_index[0] = -1  # 初始化防止while死循环
         for i in range(1, size):
             # 以当前柱子为主心骨，向左迭代寻找次级柱子
@@ -285,6 +286,7 @@ class Solution:
             min_left_index[i] = temp
         
         # 记录每个柱子的右侧第一个矮一级的柱子的下标
+        #例如heights=[3,2,4,3] -> min_left_index=[1,4,3,4]
         min_right_index[size-1] = size  # 初始化防止while死循环
         for i in range(size-2, -1, -1):
             # 以当前柱子为主心骨，向右迭代寻找次级柱子
