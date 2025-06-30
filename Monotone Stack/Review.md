@@ -277,7 +277,7 @@ class Solution:
         #例如heights=[3,2,4,3] -> min_left_index=[-1,-1,1,1]
         min_left_index[0] = -1  # 初始化防止while死循环
         for i in range(1, size):
-            # 以当前柱子为主心骨，向左迭代寻找次级柱子
+            # 以当前柱子为主心骨，向左迭代寻找次级柱子y
             temp = i - 1
             while temp >= 0 and heights[temp] >= heights[i]:
                 # 当左侧的柱子持续较高时，尝试这个高柱子自己的次级柱子（DP
