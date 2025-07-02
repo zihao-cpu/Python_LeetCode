@@ -102,3 +102,108 @@ if __name__ == "__main__":
     main()
 ```
 
+# 广搜
+
+需要一个容器来存储 遍历的元素
+
+a .首先选择一个顶点作为起始结点，并将其染成灰色，其余结点为白色。
+b. 将起始结点放入队列中。
+c. 从队列首部选出一个顶点，并找出所有与之邻接的结点，将找到的邻接结点放入队列尾部，将已访问过结点涂成黑色，没访问过的结点是白色。如果顶点的颜色是灰色，表示已经发现并且放入了队列，如果顶点的颜色是白色，表示还没有发现。
+d. 按照同样的方法处理队列中的下一个结点。基本就是出队的顶点变成黑色，在队列里的是灰色，还没入队的是白色
+
+from https://www.cnblogs.com/aiguona/p/7268667.html
+
+# 岛屿数量-深搜版
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0099.%E5%B2%9B%E5%B1%BF%E7%9A%84%E6%95%B0%E9%87%8F%E6%B7%B1%E6%90%9C.md
+
+```python
+direction = [[0, 1], [1, 0], [0, -1], [-1, 0]]  # 四个方向：上、右、下、左
+
+
+def dfs(grid, visited, x, y):
+    """
+    对一块陆地进行深度优先遍历并标记
+    """
+    for i, j in direction:
+        next_x = x + i
+        next_y = y + j
+        # 下标越界，跳过
+        if next_x < 0 or next_x >= len(grid) or next_y < 0 or next_y >= len(grid[0]):
+            continue
+        # 未访问的陆地，标记并调用深度优先搜索
+        if not visited[next_x][next_y] and grid[next_x][next_y] == 1:
+            visited[next_x][next_y] = True
+            dfs(grid, visited, next_x, next_y)
+
+
+if __name__ == '__main__':  
+    # 版本一
+    n, m = map(int, input().split())
+    
+    # 邻接矩阵
+    grid = []
+    for i in range(n):
+        grid.append(list(map(int, input().split())))
+    
+    # 访问表
+    visited = [[False] * m for _ in range(n)]
+    
+    res = 0
+    for i in range(n):
+        for j in range(m):
+            # 判断：如果当前节点是陆地，res+1并标记访问该节点，使用深度搜索标记相邻陆地。
+            if grid[i][j] == 1 and not visited[i][j]:
+                res += 1
+                visited[i][j] = True
+                dfs(grid, visited, i, j)
+    
+    print(res)
+```
+
+# 岛屿数量-广搜版
+
+```python
+
+from collections import deque
+directions = [[0, 1], [1, 0], [0, -1], [-1, 0]]
+def bfs(grid, visited, x, y):
+    que = deque([])
+    que.append([x,y])
+    while que:
+        cur_x, cur_y = que.popleft()
+        for i, j in directions:
+            next_x = cur_x + i
+            next_y = cur_y + j#有连接
+            if next_y < 0 or next_x < 0 or next_x >= len(grid) or next_y >= len(grid[0]):
+                continue
+            if not visited[next_x][next_y] and grid[next_x][next_y] == 1: 
+                visited[next_x][next_y] = True
+                que.append([next_x, next_y])
+
+
+def main():
+    n, m = map(int, input().split())
+    grid = []
+    for i in range(n):
+        grid.append(list(map(int, input().split())))
+    visited = [[False] * m for _ in range(n)]
+    res = 0
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == 1 and not visited[i][j]:
+                res += 1
+                bfs(grid, visited, i, j)
+    print(res)
+
+if __name__ == "__main__":
+    main()
+
+
+
+```
+
+
+
+
+
