@@ -299,7 +299,60 @@ for i in range(n):
 print(result)
 ```
 
+# 孤岛的总面积
 
+本题要求找到不靠边的陆地面积，那么我们只要从周边找到陆地然后 通过 dfs或者bfs 将周边靠陆地且相邻的陆地都变成海洋，然后再去重新遍历地图 统计此时还剩下的陆地就可以了。
+
+```python
+from collections import deque
+
+# 处理输入
+n, m = list(map(int, input().strip()))
+g = []
+for _ in range(n):
+    row = list(map(int, input().strip()))
+    g.append(row)
+
+# 定义四个方向、孤岛面积（遍历完边缘后会被重置）
+directions = [[0,1], [1,0], [-1,0], [0,-1]]
+count = 0
+
+# 广搜
+def bfs(r, c):
+    global count
+    q = deque()
+    q.append((r, c))
+    g[r][c] = 0
+    count += 1
+
+    while q:
+        r, c = q.popleft()
+        for di in directions:
+            next_r = r + di[0]
+            next_c = c + di[1]
+            if next_c < 0 or next_c >= m or next_r < 0 or next_r >= n:
+                continue
+            if g[next_r][next_c] == 1:
+                q.append((next_r, next_c))
+                g[next_r][next_c] = 0
+                count += 1
+
+
+for i in range(n):
+    if g[i][0] == 1: bfs(i, 0)
+    if g[i][m-1] == 1: bfs(i, m-1)
+
+for i in range(m):
+    if g[0][i] == 1: bfs(0, i)
+    if g[n-1][i] == 1: bfs(n-1, i)
+
+count = 0
+for i in range(n):
+    for j in range(m):
+        if g[i][j] == 1: bfs(i, j)
+
+print(count)
+```
 
 
 
