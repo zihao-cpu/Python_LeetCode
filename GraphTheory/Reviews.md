@@ -354,5 +354,123 @@ for i in range(n):
 print(count)
 ```
 
+# 沉默孤岛
 
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0102.%E6%B2%89%E6%B2%A1%E5%AD%A4%E5%B2%9B.md
+
+思路依然是从地图周边出发，将周边空格相邻的陆地都做上标记，然后在遍历一遍地图，遇到 陆地 且没做过标记的，那么都是地图中间的 陆地 ，全部改成水域就行。
+
+有的录友可能想，我在定义一个 visited 二维数组，单独标记周边的陆地，然后遍历地图的时候同时对 数组board 和 数组visited 进行判断，决定 陆地是否变成水域。
+
+步骤一：深搜或者广搜将地图周边的 1 （陆地）全部改成 2 （特殊标记）
+
+步骤二：将水域中间 1 （陆地）全部改成 水域（0）
+
+步骤三：将之前标记的 2 改为 1 （陆地）
+
+```python
+
+def dfs(grid, x, y):
+    grid[x][y] = 2
+    directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]  # 四个方向
+    for dx, dy in directions:
+        nextx, nexty = x + dx, y + dy
+        # 超过边界
+        if nextx < 0 or nextx >= len(grid) or nexty < 0 or nexty >= len(grid[0]):
+            continue
+        # 不符合条件，不继续遍历
+        if grid[nextx][nexty] == 0 or grid[nextx][nexty] == 2:
+            continue
+        dfs(grid, nextx, nexty)
+
+def main():
+    n, m = map(int, input().split())
+    grid = [[int(x) for x in input().split()] for _ in range(n)]
+
+    # 步骤一：
+    # 从左侧边，和右侧边 向中间遍历
+    for i in range(n):
+        if grid[i][0] == 1:
+            dfs(grid, i, 0)
+        if grid[i][m - 1] == 1:
+            dfs(grid, i, m - 1)
+
+    # 从上边和下边 向中间遍历
+    for j in range(m):
+        if grid[0][j] == 1:
+            dfs(grid, 0, j)
+        if grid[n - 1][j] == 1:
+            dfs(grid, n - 1, j)
+
+    # 步骤二、步骤三
+    for i in range(n):
+        for j in range(m):
+            if grid[i][j] == 1:
+                grid[i][j] = 0
+            if grid[i][j] == 2:
+                grid[i][j] = 1
+
+    # 打印结果
+    for row in grid:
+        print(' '.join(map(str, row)))
+
+if __name__ == "__main__":
+    main()
+```
+
+```python
+from collections import deque
+
+n, m = list(map(int, input().split()))
+g = []
+for _ in range(n):
+    row = list(map(int,input().split()))
+    g.append(row)
+    
+directions = [(1,0),(-1,0),(0,1),(0,-1)]
+count = 0
+
+def bfs(r,c,mode):
+    global count 
+    q = deque()
+    q.append((r,c))
+    count += 1
+    
+    while q:
+        r, c = q.popleft()
+        if mode:
+            g[r][c] = 2
+            
+        for di in directions:
+            next_r = r + di[0]
+            next_c = c + di[1]
+            if next_c < 0 or next_c >= m or next_r < 0 or next_r >= n:
+                continue
+            if g[next_r][next_c] == 1:
+                q.append((next_r,next_c))
+                if mode:
+                    g[r][c] = 2
+                    
+                count += 1
+    
+
+for i in range(n):
+    if g[i][0] == 1: bfs(i,0,True)
+    if g[i][m-1] == 1: bfs(i, m-1,True)
+    
+for j in range(m):
+    if g[0][j] == 1: bfs(0,j,1)
+    if g[n-1][j] == 1: bfs(n-1,j,1)
+
+for i in range(n):
+    for j in range(m):
+        if g[i][j] == 2:
+            g[i][j] = 1
+        else:
+            g[i][j] = 0
+            
+for row in g:
+    print(" ".join(map(str, row)))
+
+```
 
