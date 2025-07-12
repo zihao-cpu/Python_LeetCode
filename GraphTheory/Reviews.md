@@ -474,3 +474,55 @@ for row in g:
 
 ```
 
+# 水流问题
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0103.%E6%B0%B4%E6%B5%81%E9%97%AE%E9%A2%98.md
+
+```python
+def dfs(grid, visited, x, y, n, m):
+    if visited[x][y]:
+        return
+
+    visited[x][y] = True
+
+    directions = [(-1, 0), (0, -1), (1, 0), (0, 1)]
+
+    for dx, dy in directions:
+        next_x = x + dx
+        next_y = y + dy
+
+        if not (0 <= next_x < n and 0 <= next_y < m):
+            continue
+        if grid[x][y] < grid[next_x][next_y]:
+            continue
+
+        dfs(grid, visited, next_x, next_y, n, m)
+
+
+def is_result(grid, x, y, n, m):
+    visited = [[False] * m for _ in range(n)]
+
+    dfs(grid, visited, x, y, n, m)
+
+    is_first = any(visited[0][j] for j in range(m)) or any(visited[i][0] for i in range(n))
+    is_second = any(visited[n - 1][j] for j in range(m)) or any(visited[i][m - 1] for i in range(n))
+
+    return is_first and is_second
+
+
+def main():
+    n, m = map(int, input().split())
+
+    grid = [list(map(int, input().split())) for _ in range(n)]
+
+    for i in range(n):
+        for j in range(m):
+            if is_result(grid, i, j, n, m):
+                print(i, j)
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
