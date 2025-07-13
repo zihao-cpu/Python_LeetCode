@@ -526,3 +526,84 @@ if __name__ == "__main__":
 
 ```
 
+# 建造最大岛屿
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0104.%E5%BB%BA%E9%80%A0%E6%9C%80%E5%A4%A7%E5%B2%9B%E5%B1%BF.md
+
+第一步：一次遍历地图，得出各个岛屿的面积，并做编号记录。可以使用map记录，key为岛屿编号，value为岛屿面积
+
+第二步：再遍历地图，遍历0的方格（因为要将0变成1），并统计该1（由0变成的1）周边岛屿面积，将其相邻面积相加在一起，遍历所有 0 之后，就可以得出 选一个0变成1 之后的最大面积。
+
+```python
+import collections
+
+directions = [[-1, 0], [0, 1], [0, -1], [1, 0]]
+area = 0
+
+def dfs(i, j, grid, visited, num):
+    global area
+    
+    if visited[i][j]:
+        return
+
+    visited[i][j] = True
+    grid[i][j] = num  # 标记岛屿号码
+    area += 1
+    
+    for x, y in directions:
+        new_x = i + x
+        new_y = j + y
+        if (
+            0 <= new_x < len(grid)
+            and 0 <= new_y < len(grid[0])
+            and grid[new_x][new_y] == "1"
+        ):
+            dfs(new_x, new_y, grid, visited, num)
+    
+
+def main():
+    global area
+    
+    N, M = map(int, input().strip().split())
+    grid = []
+    for i in range(N):
+        grid.append(input().strip().split())
+    visited = [[False] * M for _ in range(N)]
+    rec = collections.defaultdict(int)
+    #第一步
+    cnt = 2
+    for i in range(N):
+        for j in range(M):
+            if grid[i][j] == "1":
+                area = 0
+                dfs(i, j, grid, visited, cnt)
+                rec[cnt] = area  # 纪录岛屿面积
+                cnt += 1
+    #第二步
+    res = 0
+    for i in range(N):
+        for j in range(M):
+            if grid[i][j] == "0":
+                max_island = 1  # 将水变为陆地，故从1开始计数
+                v = set()
+                for x, y in directions:
+                    new_x = i + x
+                    new_y = j + y
+                    if (
+                        0 <= new_x < len(grid)
+                        and 0 <= new_y < len(grid[0])
+                        and grid[new_x][new_y] != "0"
+                        and grid[new_x][new_y] not in v  # 岛屿不可重复
+                    ):
+                        max_island += rec[grid[new_x][new_y]]
+                        v.add(grid[new_x][new_y])
+                res = max(res, max_island)
+
+    if res == 0:
+        return max(rec.values())  # 无水的情况
+    return res
+    
+if __name__ == "__main__":
+    print(main())
+```
+
