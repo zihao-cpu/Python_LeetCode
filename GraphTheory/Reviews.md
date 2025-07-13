@@ -113,6 +113,10 @@ d. 按照同样的方法处理队列中的下一个结点。基本就是出队�
 
 from https://www.cnblogs.com/aiguona/p/7268667.html
 
+
+
+**这里无向图求最短路，广搜最为合适，广搜只要搜到了终点，那么一定是最短的路径**。因为广搜就是以起点中心向四周扩散的搜索
+
 # 岛屿数量-深搜版
 
 https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0099.%E5%B2%9B%E5%B1%BF%E7%9A%84%E6%95%B0%E9%87%8F%E6%B7%B1%E6%90%9C.md
@@ -605,5 +609,119 @@ def main():
     
 if __name__ == "__main__":
     print(main())
+    
+############################################################################################    
+import collections
+directions = [[-1, 0], [0, 1], [0, -1], [1, 0]]
+
+def bfs(i, j, grid, visited, num):
+    queue = collections.deque([(i, j)])
+    visited[i][j] = True
+    grid[i][j] = num
+    area = 1
+
+    while queue:
+        x, y = queue.popleft()
+        for dx, dy in directions:
+            new_x, new_y = x + dx, y + dy
+            if (
+                0 <= new_x < len(grid)
+                and 0 <= new_y < len(grid[0])
+                and grid[new_x][new_y] == "1"
+                and not visited[new_x][new_y]
+            ):
+                visited[new_x][new_y] = True
+                grid[new_x][new_y] = num
+                area += 1
+                queue.append((new_x, new_y))
+
+    return area
+
+
+def main():
+    N, M = map(int, input().strip().split())
+    grid = [input().strip().split() for _ in range(N)]
+    visited = [[False] * M for _ in range(N)]
+    rec = collections.defaultdict(int)
+
+    cnt = 2
+    for i in range(N):
+        for j in range(M):
+            if grid[i][j] == "1" and not visited[i][j]:
+                area = bfs(i, j, grid, visited, cnt)
+                rec[cnt] = area
+                cnt += 1
+
+    res = 0
+    for i in range(N):
+        for j in range(M):
+            if grid[i][j] == "0":
+                max_island = 1
+                v = set()
+                for dx, dy in directions:
+                    new_x, new_y = i + dx, j + dy
+                    if (
+                        0 <= new_x < len(grid)
+                        and 0 <= new_y < len(grid[0])
+                        and grid[new_x][new_y] != "0"
+                        and grid[new_x][new_y] not in v
+                    ):
+                        max_island += rec[grid[new_x][new_y]]
+                        v.add(grid[new_x][new_y])
+                res = max(res, max_island)
+
+    if res == 0:
+        return max(rec.values())
+    return res
+
+
+if __name__ == "__main__":
+    print(main())
 ```
 
+# 字符串接龙
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0110.%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%8E%A5%E9%BE%99.md
+
+**这里无向图求最短路，广搜最为合适，广搜只要搜到了终点，那么一定是最短的路径**。因为广搜就是以起点中心向四周扩散的搜索。
+
+**本题如果用深搜，会比较麻烦，要在到达终点的不同路径中选则一条最短路**。 而广搜只要达到终点，一定是最短路。
+
+首先题目中并没有给出点与点之间的连线，而是要我们自己去连，条件是字符只能差一个。
+
+所以判断点与点之间的关系，需要判断是不是差一个字符，**如果差一个字符，那就是有链接**。
+
+```python
+def judge(s1,s2):
+    count=0
+    for i in range(len(s1)):
+        if s1[i]!=s2[i]:
+            count+=1
+    return count==1
+
+if __name__=='__main__':
+    n=int(input())
+    beginstr,endstr=map(str,input().split())
+    if beginstr==endstr:
+        print(0)
+        exit()
+    strlist=[]
+    for i in range(n):
+        strlist.append(input())
+    
+    # use bfs
+    visit=[False for i in range(n)]
+    queue=[[beginstr,1]]
+    while queue:
+        str,step=queue.pop(0)
+        if judge(str,endstr):
+            print(step+1)
+            exit()
+        for i in range(n):   #代表方向 接下来是哪一个
+            if visit[i]==False and judge(strlist[i],str):
+                visit[i]=True
+                queue.append([strlist[i],step+1])
+    print(0)
+```
+
+关于图，**要知道 怎么构成图 不一定是矩阵的**，要抽象化 如本题。
