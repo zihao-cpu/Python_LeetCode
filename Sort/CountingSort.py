@@ -9,7 +9,7 @@
 #计数排序
 #统计各个数字出现的次数，然后根据次数将数字分配到相应的位置
 def counting_sort(arr):
-    maxValue=max(arr)
+    maxValue=max(arr)+1
     bucket=[0]*maxValue
     for i in range(len(arr)):
         if not bucket[arr[i]]:
