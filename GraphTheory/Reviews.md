@@ -725,3 +725,121 @@ if __name__=='__main__':
 ```
 
 关于图，**要知道 怎么构成图 不一定是矩阵的**，要抽象化 如本题。
+
+# 有向图的完全可达
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0105.%E6%9C%89%E5%90%91%E5%9B%BE%E7%9A%84%E5%AE%8C%E5%85%A8%E5%8F%AF%E8%BE%BE%E6%80%A7.md
+
+```python 
+import collections
+
+path = set()  # 纪录 BFS 所经过之节点
+
+def bfs(root, graph):
+    global path
+    
+    que = collections.deque([root])
+    while que:
+        cur = que.popleft()
+        path.add(cur)
+        
+        for nei in graph[cur]:
+            que.append(nei)
+        graph[cur] = []
+    return
+
+def main():
+    N, K = map(int, input().strip().split())
+    graph = collections.defaultdict(list)
+    for _ in range(K):
+        src, dest = map(int, input().strip().split())
+        graph[src].append(dest)
+    
+    bfs(1, graph)
+    if path == {i for i in range(1, N + 1)}:
+        return 1
+    return -1
+        
+
+if __name__ == "__main__":
+    print(main())
+
+```
+
+```python
+
+def dfs(graph, key, visited):
+    for neighbor in graph[key]:
+        if not visited[neighbor]:  # Check if the next node is not visited
+            visited[neighbor] = True
+            dfs(graph, neighbor, visited)
+
+def main():
+    import sys
+    input = sys.stdin.read
+    data = input().split()
+
+    n = int(data[0])
+    m = int(data[1])
+    
+    graph = [[] for _ in range(n + 1)]
+    index = 2
+    for _ in range(m):
+        s = int(data[index])
+        t = int(data[index + 1])
+        graph[s].append(t)
+        index += 2
+
+    visited = [False] * (n + 1)
+    visited[1] = True  # Process node 1 beforehand
+    dfs(graph, 1, visited)
+
+    for i in range(1, n + 1):
+        if not visited[i]:
+            print(-1)
+            return
+    
+    print(1)
+
+if __name__ == "__main__":
+    main()
+
+
+def dfs(graph, key, visited):
+    for neighbor in graph[key]:
+        if not visited[neighbor]:  # Check if the next node is not visited
+            visited[neighbor] = True
+            dfs(graph, neighbor, visited)
+
+def main():
+    import sys
+    input = sys.stdin.read
+    data = input().split()
+
+    n = int(data[0])
+    m = int(data[1])
+    
+    graph = [[] for _ in range(n + 1)]
+    index = 2
+    for _ in range(m):
+        s = int(data[index])
+        t = int(data[index + 1])
+        graph[s].append(t)
+        index += 2
+
+    visited = [False] * (n + 1)
+    visited[1] = True  # Process node 1 beforehand
+    dfs(graph, 1, visited)
+
+    for i in range(1, n + 1):
+        if not visited[i]:
+            print(-1)
+            return
+    
+    print(1)
+
+if __name__ == "__main__":
+    main()
+
+```
+
