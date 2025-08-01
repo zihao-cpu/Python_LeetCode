@@ -843,3 +843,162 @@ if __name__ == "__main__":
 
 ```
 
+# 并查集理论
+
+并查集常用来解决连通性问题。当我们需要判断两个元素是否在同一个集合里的时候，我们就要想到用并查集。
+
+- 将两个元素添加到一个集合中。
+- 判断两个元素在不在同一个集合
+
+我们将三个元素A，B，C （分别是数字）放在同一个集合，其实就是将三个元素连通在一起，如何连通呢。
+
+只需要用一个一维数组来表示，即：father[A] = B，father[B] = C 这样就表述 A 与 B 与 C连通了（有向连通图）。
+
+```
+// 将v，u 这条边加入并查集
+void join(int u, int v) {
+    u = find(u); // 寻找u的根
+    v = find(v); // 寻找v的根
+    if (u == v) return; // 如果发现根相同，则说明在一个集合，不用两个节点相连直接返回
+    father[v] = u;
+}
+```
+
+```
+// 并查集里寻根的过程
+int find(int u) {
+    if (u == father[u]) return u; // 如果根就是自己，直接返回
+    else return find(father[u]); // 如果根不是自己，就根据数组下标一层一层向下找
+}
+```
+
+```
+// 并查集初始化
+void init() {
+    for (int i = 0; i < n; ++i) {
+        father[i] = i;
+    }
+}
+```
+
+```
+// 判断 u 和 v是否找到同一个根
+bool isSame(int u, int v) {
+    u = find(u);
+    v = find(v);
+    return u == v;
+}
+```
+
+```
+// 并查集里寻根的过程
+int find(int u) {
+    if (u == father[u]) return u;
+    else return father[u] = find(father[u]); // 路径压缩
+}
+```
+
+```
+int n = 1005; // n根据题目中节点数量而定，一般比节点数量大一点就好
+vector<int> father = vector<int> (n, 0); // C++里的一种数组结构
+
+// 并查集初始化
+void init() {
+    for (int i = 0; i < n; ++i) {
+        father[i] = i;
+    }
+}
+// 并查集里寻根的过程
+int find(int u) {
+    return u == father[u] ? u : father[u] = find(father[u]); // 路径压缩
+}
+
+// 判断 u 和 v是否找到同一个根
+bool isSame(int u, int v) {
+    u = find(u);
+    v = find(v);
+    return u == v;
+}
+
+// 将v->u 这条边加入并查集
+void join(int u, int v) {
+    u = find(u); // 寻找u的根
+    v = find(v); // 寻找v的根
+    if (u == v) return ; // 如果发现根相同，则说明在一个集合，不用两个节点相连直接返回
+    father[v] = u;
+}
+```
+
+```
+class UnionFind:
+    def __init__(self, size):
+        self.parent = list(range(size + 1))  # 初始化并查集
+
+    def find(self, u):
+        if self.parent[u] != u:
+            self.parent[u] = self.find(self.parent[u])  # 路径压缩
+        return self.parent[u]
+
+    def union(self, u, v):
+        root_u = self.find(u)
+        root_v = self.find(v)
+        if root_u != root_v:
+            self.parent[root_v] = root_u
+
+    def is_same(self, u, v):
+        return self.find(u) == self.find(v)
+
+
+def main():
+    import sys
+    input = sys.stdin.read
+    data = input().split()
+    
+    index = 0
+    n = int(data[index])
+    index += 1
+    m = int(data[index])
+    index += 1
+    
+    uf = UnionFind(n)
+    
+    for _ in range(m):
+        s = int(data[index])
+        index += 1
+        t = int(data[index])
+        index += 1
+        uf.union(s, t)
+    
+    source = int(data[index])
+    index += 1
+    destination = int(data[index])
+    
+    if uf.is_same(source, destination):
+        print(1)
+    else:
+        print(0)
+
+if __name__ == "__main__":
+    main()
+```
+
+https://github.com/zihao-cpu/leetcode-master/blob/master/problems/kamacoder/0107.%E5%AF%BB%E6%89%BE%E5%AD%98%E5%9C%A8%E7%9A%84%E8%B7%AF%E5%BE%84.md
+
+
+
+```
+1 2
+1 3
+2 4
+3 4
+```
+
+parent[2]=1
+
+parent[3]=1
+
+parent[4]=find(2)->1
+
+parent[4]=find(3)>1
+
+说明 有路径
