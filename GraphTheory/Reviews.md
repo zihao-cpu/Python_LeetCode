@@ -1002,3 +1002,16 @@ parent[4]=find(2)->1
 parent[4]=find(3)>1
 
 说明 有路径
+
+# Prime最小生成树
+
+1. 第一步，选距离生成树最近节点
+
+2. 第二步，最近节点加入生成树
+
+3. 第三步，更新非生成树节点到生成树的距离（即更新minDist数组）
+
+   具体过程参考https://www.cnblogs.com/biyeymyhjob/archive/2012/07/30/2615542.html
+
+   ​
+
